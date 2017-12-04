@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Directory Listing - Dangerous?</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Full Atom Feed" />
+        <link href="/feeds/security.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Categories Atom Feed" />
+        <link href="/rss/security.xml" type="application/rss+xml" rel="alternate" title="Sachin's Blog Categories RSS Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="/" class="pure-menu-heading  pure-menu-link">Sachin's Blog</a>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="/category/security.html" class="category">security</a><br />
+
+    <a class="author" href="/author/skamath.html">skamath</a>
+    &mdash; <abbr title="2016-01-15T18:05:54+05:30">Fri 15 January 2016</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(http://www.acunetix.com/wp-content/uploads/2012/11/backup-dir3.png);">
+                <img src="http://www.acunetix.com/wp-content/uploads/2012/11/backup-dir3.png" alt="Directory Listing - Dangerous?">
+                <div class="title">
+                <h1>
+                    Directory Listing - Dangerous?
+                </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>While browsing web pages, most of us expect to see only the pages offered by the website. For instance, if you are reading this blog, you will only be expected to see my landing page, posts, tags and the author information. I'll really not want to you take a look at my admin panel or the other administrative facilities of this blog. This not only keeps my blog neat and to-the-point but also reduces the risk of attacks.</p>
+<p>So, let's assume that you are a hacker and want to gather information about my website. As the first step, you'll naturally have to find how my files are arranged/segregated. But how do you do it?</p>
+<p>Yes.Browsers! A powerful application which gets more powerful every other day. If you didn't know,every browser lets you view the source of any website by right-clicking and selecting <code>Inspect Element</code>. Let's do it. Go to any website, say <em>Google</em>. Now there's a nice colourful logo and it is an image. Images have to be stored somewhere to be able render it in a web-page. Let's find out where Google is storing it's doodle. If everything goes right, you'll see the location of the image in the CSS rules in the right-bottom corner. Something like this:
+<img alt="" src="images/cssrule.png"></p>
+<p>Awesome. Google stores their data in <code>http://google.com/images/branding/googlelogo/lx/</code>. Hmm, but that page is giving me a 404 error when visited.Let's try visiting the image URL <strong>as such</strong>.</p>
+<p><code>https://www.google.co.in/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png</code></p>
+<p>It works! What does that mean? Google managed to restrict your access to the folder that the image is in, but gave you access to the particular image. Google doesn't want you to see the entire contents of the folder because it might contain a lot of stuff that is not relevant for you. We just saw a classical example of Directory Listing being disabled.</p>
+<p>Let's look at another website. This time, a less secure one. I have setup an example on my website to demonstrate Directory listing. Go ahead and visit :
+<code>http://www.sachinwrites.xyz/sandbox/</code></p>
+<p>You will encounter this page :
+<img alt="" src="images/Screenshot-from-2016-01-15-22-56-00.png"></p>
+<p>As I mentioned earlier, every image has to be stored somewhere in some form or the other. Go ahead and do an <code>Inspect Element</code> on the Image. You will see that the image is stored in <code>/storage/sysadmin.jpg</code>. Go-to <code>https://sachinwrites.xyz/sandbox/storage/sysadmin.jpg</code> and you'll have the full-image in front of you. Let us try to look into the folder of the image. Remove the image name from the URL and see what you get.</p>
+<p><img alt="" src="images/Screenshot-from-2016-01-15-23-01-03.png"></p>
+<p>You are able to see the contents of the entire folder as the developer forgot to block Directory Indexes. Have fun exploring the new-found folder ;)</p>
+<p><strong>How exactly is this undesirable?</strong></p>
+<p>As you might have noticed, it reveals everything present in the folder. It might include sensitive documents, login credentials, php backup files, zip files and more. This can be dangerous from the security point of view.</p>
+<p><strong>How to prevent Directory Listing?</strong></p>
+<p>There are a lot of ways to do it. The easiest and the most undesirable way of doing it is to put a blank <code>index.html</code> page in every folder of your website. This way, directories won't be listed.</p>
+<p>The better way of doing it is by using a <code>.htaccess</code> file on an Apache server. You don't need an <code>.htaccess</code> for nginx server. As nginx wiki says :</p>
+<blockquote>
+<p>If you need .htaccess [with Nginx], you're probably doing it wrong.</p>
+</blockquote>
+<p>Coming back, to prevent directory listing on an entire webserver, just write <code>Options -Indexes</code> in the <code>.htaccess</code> file and you're good to go.
+The same can also be done in the apache configuration files. Also, for <code>.htaccess</code> to work properly, you need to set allow overrides in the Apache configuration files. I'll leave that part for you to figure out.</p>
+<p>There were numerous instances of a website getting pwned just because of the fact that the developer was either too lazy or stupid to block it. Directory Listing is always the first step for gathering information about a website, according to me. To conclude with, here's a bonus meme :</p>
+<p><img alt="" src="images/bill.jpg"></p>
+<p>Hope you liked the post. Comment your thoughts below and I'd be more than happy to hear from you. Cheers.</p>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="/tag/security.html">security</a>
+            <a href="/tag/guide.html">guide</a>
+            <a href="/tag/tech.html">tech</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="/author/skamath.html"><img src="https://lh6.googleusercontent.com/-zEMaXmWAhdI/AAAAAAAAAAI/AAAAAAAAAAA/eVdgsm3TIDU/s128-c-k/photo.jpg" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="/author/skamath.html">skamath</a></h3>
+                        <p class="author-description">
+                          
+            I am a self-proclaimed command-line warrior and web ninja, who slays the bad folks <i>(usually with a -9)</i>. I love security and forensics as much as I love Python. 
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'sachinwritesxyz';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="/" title="Sachin's Blog">Sachin's Blog</a>
+        <a href="/category/gsoc.html">gsoc</a>
+        <a href="/category/rants.html">rants</a>
+        <a href="/category/security.html">security</a>
+
+    </footer>
+
+</body>
+</html>

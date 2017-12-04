@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Sachin's Blog - security</title><link href="/" rel="alternate"></link><link href="/feeds/security.atom.xml" rel="self"></link><id>/</id><updated>2017-02-17T14:13:01+05:30</updated><entry><title>Wrapping your head around SSH tunnels</title><link href="/wrapping-your-head-around-ssh-tunnels.html" rel="alternate"></link><published>2017-02-17T14:13:01+05:30</published><updated>2017-02-17T14:13:01+05:30</updated><author><name>skamath</name></author><id>tag:None,2017-02-17:/wrapping-your-head-around-ssh-tunnels.html</id><summary type="html">&lt;p&gt;Understanding SSH tunnels and real-time examples.&lt;/p&gt;</summary><content type="html">&lt;blockquote&gt;
+&lt;p&gt;This post is for educational purposes only. VPN's might be illegal in some countries. If you are not sure of the consequences of tunnelling over a network/using a VPN, please do not attempt to do so. You have been warned.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;em&gt;This is my first post in the Tunnelling and OpenVPN series. More coming up soon :)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;It's been really long since I blogged so here goes a pretty long-ish detailed blog about SSH tunnels. I have been playing around with VPN's for quite some time now and have learned a lot about networking, tunnelling and other &lt;strong&gt;awesome&lt;/strong&gt; things about creating stable networks. &lt;a href="https://openvpn.net/"&gt;OpenVPN&lt;/a&gt; is a free and open source application that implement s the features of a Virtual Private Network (&lt;strong&gt;VPN&lt;/strong&gt;) to create a point-to-point secure connection. You can check out the features of OpenVPN &lt;a href="https://openvpn.net/index.php/open-source/333-what-is-openvpn.html"&gt;here&lt;/a&gt;. The possibilities and endless with OpenVPN. Using it, you can build everything ranging from a simple proxy server to a completely anonymous and secure Private network of people.&lt;/p&gt;
+&lt;p&gt;I started digging into the features of OpenVPN when my university started tightening the campus network by only allowing traffic through port 80 and 443. (Yes! 22 was blocked). Initially, I thought it was the end of git over SSH until I found out I could SSH over the HTTPS port on Github. Take a look at the article &lt;a href="https://help.github.com/articles/using-ssh-over-the-https-port/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Before we get carried away, let's get back to VPN talk. One of the solutions to "port blocks" is SSH tunnelling.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;"If we see light at the end of the tunnel, it is the light of the oncoming train" ~ Robert Lowell.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;SSH tunnelling, also known as "Poor Man's VPN", is a very powerful feature of SSH which creates a secure connection between a local computer and a remote machine through which services can be relayed.&lt;/p&gt;
+&lt;p&gt;Let us try to understand SSH tunnelling first. Creating an SSH tunnel is simple. Let us assume &lt;code&gt;Mr. FooMan&lt;/code&gt; has a cloud server in Singapore with SSH daemon running on port 22 (the default port) and he wants to redirect all this traffic via the tunnel and not directly. Now, all he will do is ssh into his box using the &lt;code&gt;-D&lt;/code&gt; directive:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ssh -D 27015 fooman@hissingaporeserver.com -p 22&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Quoting the man page of SSH:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;-D [bind_address:]port&lt;/p&gt;
+&lt;p&gt;Specifies a local “dynamic” application-level port forwarding. This works by allocating a socket to listen to port on the local side, optionally bound to the specified bind_address. Whenever a connection is made to this port, the connection is forwarded over the secure channel, and the application protocol is then used to determine where to connect to from the remote machine. Currently the SOCKS4 and SOCKS5 protocols are supported, and ssh will act as a SOCKS server. Only root can forward privileged ports. Dynamic port forwardings can also be specified in the configuration file.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;As always, if you need to use a port below 1000, you can but you will have to be root. To verify this, go ahead and run a &lt;code&gt;netstat -tlpn&lt;/code&gt; on the local machine. If everything goes well, you should see something like this:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/Screenshot-from-2017-02-17-18-46-30.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;center&gt; &lt;em&gt;Fig 1 : Port 27015 being used by the SSH process&lt;/em&gt; &lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;This means that the SSH process is now listening on port 27015 for any connections. You can now use this port for redirecting all your browser traffic or set it as a SOCKS proxy on any application that supports proxified traffic.&lt;/p&gt;
+&lt;p&gt;Let us set a system-wide proxy on Linux. For this, fire up &lt;code&gt;Network Settings&lt;/code&gt;, select Proxy and choose the method as &lt;code&gt;Manual&lt;/code&gt;. Now set the &lt;strong&gt;SOCKS&lt;/strong&gt; proxy to be localhost and the port as 27015 (or the port that followed your -D directive).&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/Screenshot-from-2017-02-17-18-53-35.png"&gt;&lt;/p&gt;
+&lt;p&gt;Once you are done, check your IP address. Viola! You have successfully proxified your entire system. Make sure you disable proxy when you are done using it or you won't be able to access the internet.&lt;/p&gt;
+&lt;p&gt;You can also configure just your Web Browser to use the proxy. I use &lt;a href="https://getfoxyproxy.org/downloads/"&gt;FoxyProxy&lt;/a&gt; to achieve this. The configuration is pretty much the same except it acts as a plugin for your browser.&lt;/p&gt;
+&lt;p&gt;There are a lot of limitations in this case. SSH tunnelling will only work if your university/office allows outgoing traffic on 22 &lt;em&gt;(most probably blocked in most universities)&lt;/em&gt;. If that is the case, you will have to take extra steps to work around the block.&lt;/p&gt;
+&lt;p&gt;I will be covering about OpenVPN in my upcoming posts. So, stay tuned! If you've anything in your mind and want to share, do drop a comment below :)&lt;/p&gt;</content><category term="foss"></category><category term="ssh"></category><category term="networking"></category></entry><entry><title>HackceptionCTF Work Log - Week 1</title><link href="/hackception-work-log-week-1.html" rel="alternate"></link><published>2016-01-23T05:33:22+05:30</published><updated>2016-01-23T05:33:22+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-01-23:/hackception-work-log-week-1.html</id><summary type="html">&lt;p&gt;Event Co-Ordinators' worklog of Hackception CTF and an introduction to Capture The Flag, organized by Sachin S Kamath and Nishaanth  Guna for Anokha 2016.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Anokha is coming! Yeayy! With less than a month to go for Anokha, work needs to be done on Hackception CTF to get it up and running on the big day. This is the second edition of the CTF, and is going to be bigger, better and merrier this time as a lot of planning has been done on the event. First things first, you can find the event page &lt;a href="https://anokha.amrita.edu/event/hackceptiononsite-ctf-event/14"&gt;here&lt;/a&gt;. What's more? It's free.&lt;/p&gt;
+&lt;p&gt;This is what the previous years' contestants had to say:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://unclassifiederrors.blogspot.in/2015/03/hackception-experience-at-amrita.html"&gt;Blog Post of Team Unclassified Errors&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hackception.wordpress.com/2015/03/05/anokha-2k15-hackception-event/"&gt;Shyam's Blog Post&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://bsdchoudhary.blogspot.in/"&gt;Sunil's Blog Post&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;And the prize winning blog post : ~~&lt;a href="https://github.com/abiram11/The-Blog/blob/master/Day1.cpp"&gt;Abhiram's Blog,err. Code&lt;/a&gt;~~ Looks like he took it down.&lt;/p&gt;
+&lt;p&gt;'Nuff said. Less talks and more hacks this time.&lt;/p&gt;
+&lt;p&gt;Wondering what a CTF is? Well, Capture-The-Flag events are usually held to test the wit , skills and intelligence of a programmer or/and a hacker. CTF's are broadly categorized into two. Jeopardy and Attack 'n' Defense. Jeopardy is more like an online treasure hunt game where you are given a few puzzles/questions along with a clue for you to solve it. Once you solve it correctly, you usually receive a flag which can be entered into a flag submission portal which will grade you on basis of the correctness of the flag you have entered. Flags are usually long strings of plain-text or a MD5 encrypted hash. Of course, it is not going to be as easy as a treasure hunt. But yeah, it ain't rocket science too ;)&lt;/p&gt;
+&lt;p&gt;Attack 'n' Defense is the real deal. You might be good with jeopardy but the real test of the skills is done in the Attack 'n' Defense round. It's &lt;em&gt;Survival of the Fittest, no mercy.&lt;/em&gt; Make Mistakes and watch your opponent tear your computer apart, savaging all the resources you have. You have to defend yourself from incoming attacks as well as attack the other opponents in a typical Attack n Defense CTF within a limited period of time. The game mechanism is fairly complex too. A gameserver, or the "Big Brother", constantly pushes random MD5 hashes into the vulnerable services of every team every &lt;em&gt;x&lt;/em&gt; minutes. A team has to break into any opponent's system and exploit a vulnerability in the hosted service to extract the flag from the user. Every successful submission of a stolen flag will give the attackers' team points and will reduce defense points of the defending team. Told you, IT'S WARRR! The Battle of 0's and 1's, and occasionally idiots.&lt;/p&gt;
+&lt;p&gt;That being said, I expect to do the following things this week :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;~~Figure out the Platform to use. Hackademic is unusable now. Bad Bad Code~~.
+Pico it is. Waiting for permissions from the authors.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;~~Setup Apache alongside nginx to support pico and MongoDB. I know they don't go well together, but yeah. Let me give it a shot~~. Done. My seniors are awesome guides :D&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;~~Write Web, Linux and Networking challenges. Easy ones. Will extend for a couple of weeks~~. Decided to make the practice questions this week.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;~~Make a Slack user group, an IRC for delivering clues and somehow link it up with Slack~~. Done. Done. Slack is awesome. IRC is well umm, just nostalgic. Gives me a 90's hacker feel :')&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Configure the above IRC Bot to automatically give out clues at random times from a predefined list of clues.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;~~Tweak  the event information, rules in the Anokha Main page.~~ Event Managers taking care of it.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Tweak pico to my heart's content.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Yes, the work is hectic and tweaking source code of an existing application is a nightmare for most programmers. Nevertheless, it's fun and always a learning experience. After all, it's for one of the biggest tech fest of South India ;)&lt;/p&gt;</content></entry><entry><title>Directory Listing - Dangerous?</title><link href="/directory-listing-dangerous.html" rel="alternate"></link><published>2016-01-15T18:05:54+05:30</published><updated>2016-01-15T18:05:54+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-01-15:/directory-listing-dangerous.html</id><summary type="html">&lt;p&gt;Post on Dangers of Directory listing, explained in a lucid and simple ma$&lt;/p&gt;</summary><content type="html">&lt;p&gt;While browsing web pages, most of us expect to see only the pages offered by the website. For instance, if you are reading this blog, you will only be expected to see my landing page, posts, tags and the author information. I'll really not want to you take a look at my admin panel or the other administrative facilities of this blog. This not only keeps my blog neat and to-the-point but also reduces the risk of attacks.&lt;/p&gt;
+&lt;p&gt;So, let's assume that you are a hacker and want to gather information about my website. As the first step, you'll naturally have to find how my files are arranged/segregated. But how do you do it?&lt;/p&gt;
+&lt;p&gt;Yes.Browsers! A powerful application which gets more powerful every other day. If you didn't know,every browser lets you view the source of any website by right-clicking and selecting &lt;code&gt;Inspect Element&lt;/code&gt;. Let's do it. Go to any website, say &lt;em&gt;Google&lt;/em&gt;. Now there's a nice colourful logo and it is an image. Images have to be stored somewhere to be able render it in a web-page. Let's find out where Google is storing it's doodle. If everything goes right, you'll see the location of the image in the CSS rules in the right-bottom corner. Something like this:
+&lt;img alt="" src="images/cssrule.png"&gt;&lt;/p&gt;
+&lt;p&gt;Awesome. Google stores their data in &lt;code&gt;http://google.com/images/branding/googlelogo/lx/&lt;/code&gt;. Hmm, but that page is giving me a 404 error when visited.Let's try visiting the image URL &lt;strong&gt;as such&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;https://www.google.co.in/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;It works! What does that mean? Google managed to restrict your access to the folder that the image is in, but gave you access to the particular image. Google doesn't want you to see the entire contents of the folder because it might contain a lot of stuff that is not relevant for you. We just saw a classical example of Directory Listing being disabled.&lt;/p&gt;
+&lt;p&gt;Let's look at another website. This time, a less secure one. I have setup an example on my website to demonstrate Directory listing. Go ahead and visit :
+&lt;code&gt;http://www.sachinwrites.xyz/sandbox/&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;You will encounter this page :
+&lt;img alt="" src="images/Screenshot-from-2016-01-15-22-56-00.png"&gt;&lt;/p&gt;
+&lt;p&gt;As I mentioned earlier, every image has to be stored somewhere in some form or the other. Go ahead and do an &lt;code&gt;Inspect Element&lt;/code&gt; on the Image. You will see that the image is stored in &lt;code&gt;/storage/sysadmin.jpg&lt;/code&gt;. Go-to &lt;code&gt;https://sachinwrites.xyz/sandbox/storage/sysadmin.jpg&lt;/code&gt; and you'll have the full-image in front of you. Let us try to look into the folder of the image. Remove the image name from the URL and see what you get.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/Screenshot-from-2016-01-15-23-01-03.png"&gt;&lt;/p&gt;
+&lt;p&gt;You are able to see the contents of the entire folder as the developer forgot to block Directory Indexes. Have fun exploring the new-found folder ;)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;How exactly is this undesirable?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As you might have noticed, it reveals everything present in the folder. It might include sensitive documents, login credentials, php backup files, zip files and more. This can be dangerous from the security point of view.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;How to prevent Directory Listing?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;There are a lot of ways to do it. The easiest and the most undesirable way of doing it is to put a blank &lt;code&gt;index.html&lt;/code&gt; page in every folder of your website. This way, directories won't be listed.&lt;/p&gt;
+&lt;p&gt;The better way of doing it is by using a &lt;code&gt;.htaccess&lt;/code&gt; file on an Apache server. You don't need an &lt;code&gt;.htaccess&lt;/code&gt; for nginx server. As nginx wiki says :&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;If you need .htaccess [with Nginx], you're probably doing it wrong.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Coming back, to prevent directory listing on an entire webserver, just write &lt;code&gt;Options -Indexes&lt;/code&gt; in the &lt;code&gt;.htaccess&lt;/code&gt; file and you're good to go.
+The same can also be done in the apache configuration files. Also, for &lt;code&gt;.htaccess&lt;/code&gt; to work properly, you need to set allow overrides in the Apache configuration files. I'll leave that part for you to figure out.&lt;/p&gt;
+&lt;p&gt;There were numerous instances of a website getting pwned just because of the fact that the developer was either too lazy or stupid to block it. Directory Listing is always the first step for gathering information about a website, according to me. To conclude with, here's a bonus meme :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/bill.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;Hope you liked the post. Comment your thoughts below and I'd be more than happy to hear from you. Cheers.&lt;/p&gt;</content><category term="security"></category><category term="guide"></category><category term="tech"></category></entry><entry><title>[Repost] Pwning an entire network using nmap</title><link href="/pwning-an-entire-network-using-nmap.html" rel="alternate"></link><published>2014-12-28T18:03:00+05:30</published><updated>2014-12-28T18:03:00+05:30</updated><author><name>skamath</name></author><id>tag:None,2014-12-28:/pwning-an-entire-network-using-nmap.html</id><summary type="html">&lt;p&gt;Originally posted on &lt;a href="https://bufferoutofbounds.wordpress.com/2014/12/29/pwning-an-entire-network-using-nmap/"&gt;HackerSpace&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;When every friend of mine was busy studying for the finals,only thing I could do was to think in what subjects I would flunk and how pathetically I would screw my GPA. Though I tried my best,only thing I was able to do was …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Originally posted on &lt;a href="https://bufferoutofbounds.wordpress.com/2014/12/29/pwning-an-entire-network-using-nmap/"&gt;HackerSpace&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;When every friend of mine was busy studying for the finals,only thing I could do was to think in what subjects I would flunk and how pathetically I would screw my GPA. Though I tried my best,only thing I was able to do was worry,worry and worry.
+Thinking of taking a break(from not studying and using FB),I thought it would be a better idea to use Whatsapp for a while.
+I switched on my Internet. Other than the boring texts from the groups,I didn’t get anything(as usual xP). After some time,beep beep and I get a text from Sachin who is my junior(most of the time hyperactive) Then was suggesting me if we could try to get access to the cameras around our college infrastructure.&lt;/p&gt;
+&lt;p&gt;The idea seemed nice. And since I was doing almost nothing,I thought it would be better to do something interesting.&lt;/p&gt;
+&lt;p&gt;So,what have we got?
+Nothing except the IP of FTP address which we use very often in our labs to download books and questions.
+It was of the range 172.17.171.*
+Thought we would do a sweep of 172.17.171.0-255 range.
+Being so stupid,I tried to write a script which scans all the IP’s within that range. Though I could make it work,I wasn’t able to make it scan fast enough.
+But,we got 7 IP’s which were up in that range. So,we took one IP and tried opening.&lt;/p&gt;
+&lt;p&gt;Bazinga! It was a surveillance camera. Obviously it was password protected.
+But sad. They forgot to change the default password of the camera. So we did Google for the specific camera’s default user name and password.
+We’re in! We never thought it would happen. That camera was of that of my college’s library.&lt;/p&gt;
+&lt;p&gt;We started thinking about getting access to all the cameras(Just for fun,though xP).
+It was becoming late and I haven’t studied for my exam yet.
+So Sachin said that he would volunteer for the job of entire ping sweep of all 65535 IP’s in that range. This time we thought we would take help from Nmap which is blazingly fast.
+It took just minutes to scan the entire network and we got 1212 IP’s which were live.&lt;/p&gt;
+&lt;p&gt;Again! The next problem.How can we know if that specific IP corresponds to a camera or not?
+I did a curl of the webpage and checked using grep if that site’s source code contained the word ‘XYZBrand Camera’. Bingo! We got all the cameras in our network. But certain of the passwords didn’t match with the default ones. So we brute forced everything.
+We got into all the cameras of our infrastructure.&lt;/p&gt;
+&lt;p&gt;But,wait! What about the rest of the IP’s? We tried different search terms like ‘Router’,’Switch’,’Firewall’. And at last,we got all the IP’s of Cameras + Routers + Switches + Firewall and some blackbox shit which we couldn’t understand what it is.
+So we thought of trying the default password for each service. If not,we brute forced and got access.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Mission accomplished!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;(I get it. I screwed up my exams and even flunked in one subject which I thought I would definitely pass. Karma -_- I am planning to study for that once this post is done.)&lt;/p&gt;
+&lt;p&gt;Lessons learned :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Nmap is always the best.&lt;/li&gt;
+&lt;li&gt;Study for your final exams.&lt;/li&gt;
+&lt;li&gt;Never forget the basics of penetration testing.&lt;/li&gt;
+&lt;li&gt;Never report this to college officials.
+Chances are high that they wouldn’t give a damn or embarrass for pointing out vulnerabilities in their server.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;(The characters mentioned in this story are real and are having a tough time in college to study for the exams and never get grades up to their parent’s expectation)&lt;/p&gt;</content><category term="college"></category><category term="security"></category><category term="hacking"></category></entry></feed>

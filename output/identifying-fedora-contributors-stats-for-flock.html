@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Identifying Fedora Contributors - Stats for Flock</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Full Atom Feed" />
+        <link href="/feeds/gsoc.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Categories Atom Feed" />
+        <link href="/rss/gsoc.xml" type="application/rss+xml" rel="alternate" title="Sachin's Blog Categories RSS Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="/" class="pure-menu-heading  pure-menu-link">Sachin's Blog</a>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="/category/gsoc.html" class="category">gsoc</a><br />
+
+    <a class="author" href="/author/skamath.html">skamath</a>
+    &mdash; <abbr title="2016-08-06T13:06:00+05:30">Sat 06 August 2016</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(https://communityblog.fedoraproject.org/wp-content/uploads/2016/03/gsoc-announce-1.png);">
+                <img src="https://communityblog.fedoraproject.org/wp-content/uploads/2016/03/gsoc-announce-1.png" alt="Identifying Fedora Contributors - Stats for Flock">
+                <div class="title">
+                <h1>
+                    Identifying Fedora Contributors - Stats for Flock
+                </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>Quoting the Fedora Wiki :</p>
+<blockquote>
+<p>Flock is an annual conference for Fedora contributors to come together, discuss new ideas, work to make those ideas a reality, and continue to promote the core values of the Fedora Community: Freedom, Friends, Features, and First.</p>
+</blockquote>
+<p>I was working on generating statistics for Flock this week. Bhagyashree (bee2502), my GSoC mentor,  had delivered a <a href="http://sched.co/76oD">talk</a> on Fedora Contributors and Newcomers Onboarding and I was assigned the task of generating statistics of the whole Fedora Community. At first thought, this was a pretty hectic thing to do. To accomplish this, I will need data of all the contributors from the beginning of fedmsg -i.e from 2012. And, I will have to find when a user had signed up for a FAS account and track his/her activity. <em>Phew!</em></p>
+<p>Now let's crunch the numbers :</p>
+<p><strong>Estimating Users :</strong></p>
+<p><img alt="Fedora Badges Statistics" src="images/Screenshot-from-2016-08-08-18-49-45.png"></p>
+<p>It was pretty simple, the Fedora Badges front-end (Tahrir) suggested that there were around 41,000 FAS Accounts which fedmsg was tracking and had logged into the badges website. I assumed that if an account was to be of a contributor, he/she should have logged into the badges system. Okay, so I have the count, what now?</p>
+<p><strong>Making sense out of the mess :</strong></p>
+<p>I fired up my tool and added an extra element to it, i.e : the topic field of the requests (as <code>org.fedoraproject.prod.fas.user.create</code>) and set the <code>--start</code> and <code>--end</code> to match the starting and ending date of every year.</p>
+<p>In simple terms, I am pulling the usernames of all those people who made their FAS account in between the years 201<strong>x</strong> - 201<strong>(x+1)</strong> (from 2012 to 2016), one year at a time. This will give me the total count of FAS accounts made every year. I could have just taken the <code>count</code> value from the JSON for this, but I needed the usernames for later. Along with this, I also dumped the usernames into a file in the format <code>{username : timestamp_of_creation}</code> into a file.</p>
+<p>It looked something like <a href="https://github.com/sachinkamath/fedora-flock/blob/master/dumps/2012.json">this</a>. I did this for all the years until I had <code>2012.json</code> to <code>2016.json</code>.</p>
+<p>This gave me the count of FAS accounts being made every year - and with some pygal magic, I got this :</p>
+<p><center><em>Right click and select View Image for an interactive graph</em></center>
+<img alt="Yearwise FAS Accounts" src="images/new_fas_users_line.svg"></p>
+<p><strong>Pull, pull, pull :</strong></p>
+<p>Now that we have the usernames and the timestamp of creation, we can check if the user was active for a certain period or not. I did this by pulling the data of a user with the <code>--start</code> and the <code>--end</code> arguments in 3 different ways.</p>
+<p>1) Check if the user was active immediately, for that - the <code>--start</code> was set as <strong><code>T1</code> = (time of account creation)</strong> and end was set as <strong><code>T2</code> = (time of account creation + timedelta of 2 weeks)</strong>.</p>
+<p>If the user had <code>count &gt; 10</code>, then the user was checked if the user was active between <strong><code>T2</code></strong> and <strong><code>T2 + time delta of one month</code></strong>. If the user did not have any, a variable called <code>slow_start</code> was set to True for that user and was subsequently checked for 6+ months activity. Why? Because, there are a lot of people who created a FAS account early and started contributing after an year or so. Again, if <code>count</code> was less than 0, then the user was marked inactive.  If the user had activity during this period, he/she was marked as a slow starter. And this is what I got after running the script :</p>
+<script src="https://gist.github.com/sachinkamath/95cdd1f5587d5581f25938ead5a8ceeb.js"></script>
+
+<p><strong>Identifying long-term and short-term contributors :</strong></p>
+<p>The following set of rules were set followed for differentiating users :</p>
+<p><em>Users considered inactive :</em></p>
+<p>1) Users who have less than 10 fedmsg activity count
+2) Users who have only created FAS
+3) Users who made very few wiki edits + created a FAS account
+4) <code>not_category</code> was set as fedbadges for such messages - so that the fedmsg activity won't exceed 10.</p>
+<p><em>Users considered short term :</em></p>
+<p>1) Users who have activity &lt; 3 months.
+2) People who have considerable amount of fedmsg activity and don't have any activity after a month.
+3) <code>not_category</code> is again set as fedbadges here.</p>
+<p><em>Users considered long term:</em></p>
+<p>1) Users who have 3+ months of activity
+2) Even if a user hasn't contributed in 6 months after creating the FAS account and then has considerable amount of fedmsg activity after another 6 months or an year.
+3) Don't call it a comeback badge is considered https://badges.fedoraproject.org/badge/dont-call-it-a-comeback</p>
+<p>After running this, I ended up with the following graph:</p>
+<p><center><em>Right click and select View Image for an interactive graph</em></center>
+<img alt="" src="images/activity_user_yearwise-1.svg"></p>
+<p>All this ended up in Flock in the form of a <a href="https://docs.google.com/presentation/d/1ANub0RZtqnLaBDzpiQRUkZdnf7n75Pn9H16gb0wZg68/">presentation</a> and not to mention, had a good sleep after crunching up the stats :)</p>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="/tag/fedora.html">fedora</a>
+            <a href="/tag/gsoc.html">gsoc</a>
+            <a href="/tag/python.html">python</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="/author/skamath.html"><img src="https://lh6.googleusercontent.com/-zEMaXmWAhdI/AAAAAAAAAAI/AAAAAAAAAAA/eVdgsm3TIDU/s128-c-k/photo.jpg" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="/author/skamath.html">skamath</a></h3>
+                        <p class="author-description">
+                          
+            I am a self-proclaimed command-line warrior and web ninja, who slays the bad folks <i>(usually with a -9)</i>. I love security and forensics as much as I love Python. 
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'sachinwritesxyz';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="/" title="Sachin's Blog">Sachin's Blog</a>
+        <a href="/category/gsoc.html">gsoc</a>
+        <a href="/category/rants.html">rants</a>
+        <a href="/category/security.html">security</a>
+
+    </footer>
+
+</body>
+</html>

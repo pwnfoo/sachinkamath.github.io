@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Sachin's Blog</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2017-02-17T14:13:01+05:30</updated><entry><title>Wrapping your head around SSH tunnels</title><link href="/wrapping-your-head-around-ssh-tunnels.html" rel="alternate"></link><published>2017-02-17T14:13:01+05:30</published><updated>2017-02-17T14:13:01+05:30</updated><author><name>skamath</name></author><id>tag:None,2017-02-17:/wrapping-your-head-around-ssh-tunnels.html</id><summary type="html">&lt;p&gt;Understanding SSH tunnels and real-time examples.&lt;/p&gt;</summary><content type="html">&lt;blockquote&gt;
+&lt;p&gt;This post is for educational purposes only. VPN's might be illegal in some countries. If you are not sure of the consequences of tunnelling over a network/using a VPN, please do not attempt to do so. You have been warned.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;em&gt;This is my first post in the Tunnelling and OpenVPN series. More coming up soon :)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;It's been really long since I blogged so here goes a pretty long-ish detailed blog about SSH tunnels. I have been playing around with VPN's for quite some time now and have learned a lot about networking, tunnelling and other &lt;strong&gt;awesome&lt;/strong&gt; things about creating stable networks. &lt;a href="https://openvpn.net/"&gt;OpenVPN&lt;/a&gt; is a free and open source application that implement s the features of a Virtual Private Network (&lt;strong&gt;VPN&lt;/strong&gt;) to create a point-to-point secure connection. You can check out the features of OpenVPN &lt;a href="https://openvpn.net/index.php/open-source/333-what-is-openvpn.html"&gt;here&lt;/a&gt;. The possibilities and endless with OpenVPN. Using it, you can build everything ranging from a simple proxy server to a completely anonymous and secure Private network of people.&lt;/p&gt;
+&lt;p&gt;I started digging into the features of OpenVPN when my university started tightening the campus network by only allowing traffic through port 80 and 443. (Yes! 22 was blocked). Initially, I thought it was the end of git over SSH until I found out I could SSH over the HTTPS port on Github. Take a look at the article &lt;a href="https://help.github.com/articles/using-ssh-over-the-https-port/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Before we get carried away, let's get back to VPN talk. One of the solutions to "port blocks" is SSH tunnelling.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;"If we see light at the end of the tunnel, it is the light of the oncoming train" ~ Robert Lowell.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;SSH tunnelling, also known as "Poor Man's VPN", is a very powerful feature of SSH which creates a secure connection between a local computer and a remote machine through which services can be relayed.&lt;/p&gt;
+&lt;p&gt;Let us try to understand SSH tunnelling first. Creating an SSH tunnel is simple. Let us assume &lt;code&gt;Mr. FooMan&lt;/code&gt; has a cloud server in Singapore with SSH daemon running on port 22 (the default port) and he wants to redirect all this traffic via the tunnel and not directly. Now, all he will do is ssh into his box using the &lt;code&gt;-D&lt;/code&gt; directive:&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;ssh -D 27015 fooman@hissingaporeserver.com -p 22&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Quoting the man page of SSH:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;-D [bind_address:]port&lt;/p&gt;
+&lt;p&gt;Specifies a local “dynamic” application-level port forwarding. This works by allocating a socket to listen to port on the local side, optionally bound to the specified bind_address. Whenever a connection is made to this port, the connection is forwarded over the secure channel, and the application protocol is then used to determine where to connect to from the remote machine. Currently the SOCKS4 and SOCKS5 protocols are supported, and ssh will act as a SOCKS server. Only root can forward privileged ports. Dynamic port forwardings can also be specified in the configuration file.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;As always, if you need to use a port below 1000, you can but you will have to be root. To verify this, go ahead and run a &lt;code&gt;netstat -tlpn&lt;/code&gt; on the local machine. If everything goes well, you should see something like this:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/Screenshot-from-2017-02-17-18-46-30.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;center&gt; &lt;em&gt;Fig 1 : Port 27015 being used by the SSH process&lt;/em&gt; &lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;This means that the SSH process is now listening on port 27015 for any connections. You can now use this port for redirecting all your browser traffic or set it as a SOCKS proxy on any application that supports proxified traffic.&lt;/p&gt;
+&lt;p&gt;Let us set a system-wide proxy on Linux. For this, fire up &lt;code&gt;Network Settings&lt;/code&gt;, select Proxy and choose the method as &lt;code&gt;Manual&lt;/code&gt;. Now set the &lt;strong&gt;SOCKS&lt;/strong&gt; proxy to be localhost and the port as 27015 (or the port that followed your -D directive).&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/Screenshot-from-2017-02-17-18-53-35.png"&gt;&lt;/p&gt;
+&lt;p&gt;Once you are done, check your IP address. Viola! You have successfully proxified your entire system. Make sure you disable proxy when you are done using it or you won't be able to access the internet.&lt;/p&gt;
+&lt;p&gt;You can also configure just your Web Browser to use the proxy. I use &lt;a href="https://getfoxyproxy.org/downloads/"&gt;FoxyProxy&lt;/a&gt; to achieve this. The configuration is pretty much the same except it acts as a plugin for your browser.&lt;/p&gt;
+&lt;p&gt;There are a lot of limitations in this case. SSH tunnelling will only work if your university/office allows outgoing traffic on 22 &lt;em&gt;(most probably blocked in most universities)&lt;/em&gt;. If that is the case, you will have to take extra steps to work around the block.&lt;/p&gt;
+&lt;p&gt;I will be covering about OpenVPN in my upcoming posts. So, stay tuned! If you've anything in your mind and want to share, do drop a comment below :)&lt;/p&gt;</content><category term="foss"></category><category term="ssh"></category><category term="networking"></category></entry><entry><title>The dumb Internet of Things</title><link href="/dumb-iot.html" rel="alternate"></link><published>2016-10-24T19:57:23+05:30</published><updated>2016-10-24T19:57:23+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-10-24:/dumb-iot.html</id><summary type="html">&lt;p&gt;The Internet of Things (IoT) is the trending buzz word in the field of computing today. Going by the dictionary, IoT is a collective name given to pieces of hardware, varying in size and power, from different corners of the world to the one large entity: &lt;strong&gt;The Internet.&lt;/strong&gt; IoT is …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The Internet of Things (IoT) is the trending buzz word in the field of computing today. Going by the dictionary, IoT is a collective name given to pieces of hardware, varying in size and power, from different corners of the world to the one large entity: &lt;strong&gt;The Internet.&lt;/strong&gt; IoT is all about connecting devices to the Internet to make them communicate to each other, thereby making them efficient, productive and apparently, "smart".&lt;/p&gt;
+&lt;p&gt;We have all been dealing with "smart" devices in some form or the other. Consider the classical example of a slate. Earlier, it used to be a slab of polished stone on which one could make marking using a chalk. It slowly transitioned into the &lt;em&gt;magic-slate&lt;/em&gt;, which could magically rub off the entire content of a panel with a swipe of a stick under it. &lt;em&gt;Smart, wasn't it?&lt;/em&gt; It saved a lot of chalk, polishing, labour, and parents did not have to bother about their child catching dust-allergy. The intention of innovation was clear - to make the world a better place. But, are we there just yet?&lt;/p&gt;
+&lt;p&gt;It is only a week back a massive DDoS (Distributed Denial of Service) attack took place which crippled many Internet giants like LinkedIn, Twitter, Github and Spotify. Let us try to understand what this DDoS with an analogy.
+Imagine that you are at home and you are waiting for a really important phone call from your best friend. All of a sudden, tens of thousands of people call your phone number at the same time trying to tell you something. The odds of your friend's important information getting through to you go down drastically because your phone line can only handle one call at a time. DDoS attacks are kind of like that but only with a computer. While the computer/server has more resources that it can use simultaneously, eventually, it too can get overwhelmed resulting in a complete crash or ridiculous load times. (Thank you, Reddit!)&lt;/p&gt;
+&lt;p&gt;Following the attack, an immediate investigation was called for and it was reported that a huge army of hijacked Internet-connected devices was responsible for this attack. The attack reportedly peaked at around 1Tbps, large enough to bring down even the most powerful of servers. Now, this was not one or two people attacking the servers, but thousands of them, each with a bandwidth of its own from around the world.&lt;/p&gt;
+&lt;p&gt;Talking more about the attack, it does not show how skilled the people behind the attack is, but only shows how dumb the devices connected to the Internet are. The field of IoT is now being driven by business rather than technology and run for more devices on the cloud have left us insecure. Your innocent looking hand-held devices, Smart TV's, Cameras, Coffee Machines, etc can turn into Internet-killers of a large botnet group in no less than a couple of seconds and you will not even know about it until the cops come knocking at your doorsteps. Such is the amount of negative impact these tiny little machines have created today.&lt;/p&gt;
+&lt;p&gt;Why did this happen? Can another such attack be prevented? The answer depends on how the society reacts to the crisis and tries to understand the importance of cyber-security. Companies are releasing products with outdated software and ancient version of software with various vulnerabilities in them which allows a remote attacker to gain control over the device and use it as he/she needs. One of the vulnerabilities that the attackers try to exploit exists in the SSH service of devices that lets people connect remotely to it and execute commands. Shockingly, CVE-2004-1653 - a 12-year-old vulnerability in the SSH service was exploited recently to gain illegal control of devices. This clearly shows the disinterest of manufacturers in investing on security checks and audits.  &lt;/p&gt;
+&lt;p&gt;In a world like this, staying safe online is as much important as staying safe in the real-life. Do not be that "yet another dumb" owner of an IoT device. It is often recommended to always keep your devices up-to-date with the latest patches and updates from the manufacturer. It is also a good idea to change the default values in the configuration of all your devices so that attackers can't find you through automation script. Be smart while dealing with your dumb devices. They need you as much as you need them.&lt;/p&gt;</content></entry><entry><title>The final week - GSoC Wrap Up</title><link href="/gsoc-final-week.html" rel="alternate"></link><published>2016-08-15T09:05:46+05:30</published><updated>2016-08-15T09:05:46+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-08-15:/gsoc-final-week.html</id><summary type="html">&lt;p&gt;Happy Independence day, India!&lt;/p&gt;
+&lt;p&gt;Also, today marks the beginning of the GSoC deadline week. This post will wrap-up what I have done during my intern period.&lt;/p&gt;
+&lt;h1&gt;Community Bonding period&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Figure out how fedmsg works&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;fedmsg (FEDerated MeSsaGe bus) is a python package and API defining a brokerless messaging architecture to …&lt;/pre&gt;&lt;/div&gt;&lt;/li&gt;&lt;/ul&gt;</summary><content type="html">&lt;p&gt;Happy Independence day, India!&lt;/p&gt;
+&lt;p&gt;Also, today marks the beginning of the GSoC deadline week. This post will wrap-up what I have done during my intern period.&lt;/p&gt;
+&lt;h1&gt;Community Bonding period&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Figure out how fedmsg works&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;fedmsg (FEDerated MeSsaGe bus) is a python package and API defining a brokerless messaging architecture to send and receive messages to and from applications.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;fedmsg was used to gather messages for statistics generation.&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://www.fedmsg.com/en/latest/"&gt;Documentation&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Figure out how datagrepper works.&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;Datagrepper is a web-app to retrieve historical information about messages on the fedmsg bus. It is a JSON API for the datanommer message store.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Datagrepper queries were made to retrieve messages for users and was letter compiled into one bigger JSON file and rendered into other forms of output.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://apps.fedoraproject.org/datagrepper/reference"&gt;Reference&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Familiarize with all the tools in Toolbox.&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;CommOps Toolbox is a set of tools that aims at automating tedious tasks.
+&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;I had to deliver a tool which could be combined with the existing tools for CommOps storytelling and Metrics process.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://fedoraproject.org/wiki/CommOps#Toolbox"&gt;Reference&lt;/a&gt;&lt;/p&gt;
+&lt;h1&gt;Coding Period - Mid Term&lt;/h1&gt;
+&lt;p&gt;&lt;br&gt;
+&lt;strong&gt;1st Quarter:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Onboarding Series - Badge Identification&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Onboarding is really important for large communities like Fedora. Until Fedora Hubs arrives, badges were decided to be an ideal way to track progress.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Started digging information on badges and how it works.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Automated GSoC Reports&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;A tool was to be delivered that could initially give statistics of all the Fedora / RedHat / Outreachy interns that would automatically generate CSV's and graphs based on a user's activity. Scaling the tool was pushed for later.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Repo for data : https://github.com/sachinkamath/fedstats-data/&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Badges .yaml definitions&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;This was pushed for as the tool had to added into the toolbox before the mid-term.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Automate Events Report Analysis&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Bee's Script (to be uploaded) as a start&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Parse a csv, give rudimentary stats about users/fedmsgs:
+           Using stats-tool : &lt;a href="https://docs.google.com/spreadsheets/d/11vOxzGmZKagfHYlkW4dXY4EovRcUXVxOJ5OsEId0DBE/edit#gid=0"&gt;PyCon Data&lt;/a&gt; ( PyCon US Statistics was generated using this tool)&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;2nd Quarter:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Work on adding more features to the tool&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;More output options such as markdown, gource and csv was added during this period
+&lt;br&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Generate mid-term reports&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Public repo : &lt;a href="https://github.com/sachinkamath/fedstats-data/tree/master/interns-mid-term"&gt;fedstats-data&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Blog Posts for this period&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://sachinwrites.xyz/2016/05/02/gsoc-16-summer-with-fedora/"&gt;Summer with Fedora&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://sachinwrites.xyz/2016/05/25/gsoc-16-let-the-coding-begin/"&gt;Let the Coding Begin&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://sachinwrites.xyz/2016/05/28/getting-fedstats-gsoc-production-ready/"&gt;Getting fedstats production ready&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://sachinwrites.xyz/2016/06/06/digging-deep-into-datagrepper-more-statistics-features/"&gt;Digging deep into datagrepper&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://sachinwrites.xyz/2016/06/21/fedstats-a-final-overview/"&gt;Mid term Overview&lt;/a&gt;&lt;/p&gt;
+&lt;h1&gt;Mid-term to Finals&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Scale GSoC metrics script for teams and events.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;https://sachinwrites.xyz/tag/gsoc&lt;/li&gt;
+&lt;li&gt;https://pagure.io/gsoc-stats/branch/develop&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Improving the efficiency of the script.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Local JSON caching and organized output pulls.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Scraping an entire group&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Using the python-fedora API, it was made possible. Selenium and bs4 didn't work due to CSRF issues.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Onboarding - One at a time, extends Post- GSoC&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;https://fedorahosted.org/fedora-badges/ticket/464&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;https://fedorahosted.org/fedora-badges/ticket/466&lt;/li&gt;
+&lt;li&gt;https://fedorahosted.org/fedora-badges/ticket/434&lt;/li&gt;
+&lt;li&gt;https://fedorahosted.org/fedora-badges/ticket/441&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;https://fedorahosted.org/fedora-badges/ticket/442&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Contributor Statistics using GSoC tool&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;More details in &lt;a href="https://sachinwrites.xyz/2016/08/06/identifying-fedora-contributors-stats-for-flock/"&gt;this&lt;/a&gt; blog post.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Statistics was presented at Flock by bee. &lt;a href="https://docs.google.com/presentation/d/1ANub0RZtqnLaBDzpiQRUkZdnf7n75Pn9H16gb0wZg68/"&gt;Presentation Link&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Code Scrubbing and style fixes&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Blog Posts for this period&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://sachinwrites.xyz/2016/06/29/gsoc-journey-so-far-badges-milestones-and-more/"&gt;Journey So Far&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://sachinwrites.xyz/2016/07/17/understanding-the-statscache-daemon/"&gt;Understanding statscache&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://sachinwrites.xyz/2016/07/24/improving-statistics-using-python-fedora-api/"&gt;Improving statistics using python-fedora API&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://sachinwrites.xyz/2016/07/30/fedstats-final-touches-and-road-ahead/"&gt;Final touches and road ahead&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://sachinwrites.xyz/2016/08/06/identifying-fedora-contributors-stats-for-flock/"&gt;Identifying Fedora Contributors&lt;/a&gt;&lt;/p&gt;
+&lt;h1&gt;Post GSOC&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;Work on statscache&lt;ul&gt;
+&lt;li&gt;https://github.com/fedora-infra/statscache&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Modularize existing tool - Work in Progress&lt;ul&gt;
+&lt;li&gt;https://pagure.io/gsoc-stats/branch/modular&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Master tool for all in one metrics&lt;ul&gt;
+&lt;li&gt;Integrate badge statistics, a flask front-end for metrics for one-click statistics generation.
+&lt;hr&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Working with the amazing people over at Fedora was indeed a really good experience. In this 3 months, I collected around &lt;a href="https://badges.fedoraproject.org/user/skamath"&gt;51 badges&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;One badge which I am really proud of this the black and white cookie badge, given to users who have helped 25 Fedorans. It has been only awarded to 31 times so far. Cookies! \o/&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="https://badges.fedoraproject.org/pngs/blackandwhitecookie.png"&gt;&lt;/p&gt;
+&lt;p&gt;Current badges rank, Gotta Badge 'Em All!&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/Screenshot-from-2016-08-15-14-29-53.png"&gt;&lt;/p&gt;
+&lt;p&gt;Current Repository statistics :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/Screenshot-from-2016-08-15-14-31-30.png"&gt;&lt;/p&gt;</content><category term="fedora"></category><category term="gsoc"></category><category term="python"></category></entry><entry><title>Identifying Fedora Contributors - Stats for Flock</title><link href="/identifying-fedora-contributors-stats-for-flock.html" rel="alternate"></link><published>2016-08-06T13:06:00+05:30</published><updated>2016-08-06T13:06:00+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-08-06:/identifying-fedora-contributors-stats-for-flock.html</id><summary type="html">&lt;p&gt;Quoting the Fedora Wiki :&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Flock is an annual conference for Fedora contributors to come together, discuss new ideas, work to make those ideas a reality, and continue to promote the core values of the Fedora Community: Freedom, Friends, Features, and First.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I was working on generating statistics for Flock this …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Quoting the Fedora Wiki :&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Flock is an annual conference for Fedora contributors to come together, discuss new ideas, work to make those ideas a reality, and continue to promote the core values of the Fedora Community: Freedom, Friends, Features, and First.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I was working on generating statistics for Flock this week. Bhagyashree (bee2502), my GSoC mentor,  had delivered a &lt;a href="http://sched.co/76oD"&gt;talk&lt;/a&gt; on Fedora Contributors and Newcomers Onboarding and I was assigned the task of generating statistics of the whole Fedora Community. At first thought, this was a pretty hectic thing to do. To accomplish this, I will need data of all the contributors from the beginning of fedmsg -i.e from 2012. And, I will have to find when a user had signed up for a FAS account and track his/her activity. &lt;em&gt;Phew!&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Now let's crunch the numbers :&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Estimating Users :&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Fedora Badges Statistics" src="images/Screenshot-from-2016-08-08-18-49-45.png"&gt;&lt;/p&gt;
+&lt;p&gt;It was pretty simple, the Fedora Badges front-end (Tahrir) suggested that there were around 41,000 FAS Accounts which fedmsg was tracking and had logged into the badges website. I assumed that if an account was to be of a contributor, he/she should have logged into the badges system. Okay, so I have the count, what now?&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Making sense out of the mess :&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I fired up my tool and added an extra element to it, i.e : the topic field of the requests (as &lt;code&gt;org.fedoraproject.prod.fas.user.create&lt;/code&gt;) and set the &lt;code&gt;--start&lt;/code&gt; and &lt;code&gt;--end&lt;/code&gt; to match the starting and ending date of every year.&lt;/p&gt;
+&lt;p&gt;In simple terms, I am pulling the usernames of all those people who made their FAS account in between the years 201&lt;strong&gt;x&lt;/strong&gt; - 201&lt;strong&gt;(x+1)&lt;/strong&gt; (from 2012 to 2016), one year at a time. This will give me the total count of FAS accounts made every year. I could have just taken the &lt;code&gt;count&lt;/code&gt; value from the JSON for this, but I needed the usernames for later. Along with this, I also dumped the usernames into a file in the format &lt;code&gt;{username : timestamp_of_creation}&lt;/code&gt; into a file.&lt;/p&gt;
+&lt;p&gt;It looked something like &lt;a href="https://github.com/sachinkamath/fedora-flock/blob/master/dumps/2012.json"&gt;this&lt;/a&gt;. I did this for all the years until I had &lt;code&gt;2012.json&lt;/code&gt; to &lt;code&gt;2016.json&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This gave me the count of FAS accounts being made every year - and with some pygal magic, I got this :&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;em&gt;Right click and select View Image for an interactive graph&lt;/em&gt;&lt;/center&gt;
+&lt;img alt="Yearwise FAS Accounts" src="images/new_fas_users_line.svg"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Pull, pull, pull :&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Now that we have the usernames and the timestamp of creation, we can check if the user was active for a certain period or not. I did this by pulling the data of a user with the &lt;code&gt;--start&lt;/code&gt; and the &lt;code&gt;--end&lt;/code&gt; arguments in 3 different ways.&lt;/p&gt;
+&lt;p&gt;1) Check if the user was active immediately, for that - the &lt;code&gt;--start&lt;/code&gt; was set as &lt;strong&gt;&lt;code&gt;T1&lt;/code&gt; = (time of account creation)&lt;/strong&gt; and end was set as &lt;strong&gt;&lt;code&gt;T2&lt;/code&gt; = (time of account creation + timedelta of 2 weeks)&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;If the user had &lt;code&gt;count &amp;gt; 10&lt;/code&gt;, then the user was checked if the user was active between &lt;strong&gt;&lt;code&gt;T2&lt;/code&gt;&lt;/strong&gt; and &lt;strong&gt;&lt;code&gt;T2 + time delta of one month&lt;/code&gt;&lt;/strong&gt;. If the user did not have any, a variable called &lt;code&gt;slow_start&lt;/code&gt; was set to True for that user and was subsequently checked for 6+ months activity. Why? Because, there are a lot of people who created a FAS account early and started contributing after an year or so. Again, if &lt;code&gt;count&lt;/code&gt; was less than 0, then the user was marked inactive.  If the user had activity during this period, he/she was marked as a slow starter. And this is what I got after running the script :&lt;/p&gt;
+&lt;script src="https://gist.github.com/sachinkamath/95cdd1f5587d5581f25938ead5a8ceeb.js"&gt;&lt;/script&gt;
+
+&lt;p&gt;&lt;strong&gt;Identifying long-term and short-term contributors :&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The following set of rules were set followed for differentiating users :&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Users considered inactive :&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;1) Users who have less than 10 fedmsg activity count
+2) Users who have only created FAS
+3) Users who made very few wiki edits + created a FAS account
+4) &lt;code&gt;not_category&lt;/code&gt; was set as fedbadges for such messages - so that the fedmsg activity won't exceed 10.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Users considered short term :&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;1) Users who have activity &amp;lt; 3 months.
+2) People who have considerable amount of fedmsg activity and don't have any activity after a month.
+3) &lt;code&gt;not_category&lt;/code&gt; is again set as fedbadges here.&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Users considered long term:&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;1) Users who have 3+ months of activity
+2) Even if a user hasn't contributed in 6 months after creating the FAS account and then has considerable amount of fedmsg activity after another 6 months or an year.
+3) Don't call it a comeback badge is considered https://badges.fedoraproject.org/badge/dont-call-it-a-comeback&lt;/p&gt;
+&lt;p&gt;After running this, I ended up with the following graph:&lt;/p&gt;
+&lt;p&gt;&lt;center&gt;&lt;em&gt;Right click and select View Image for an interactive graph&lt;/em&gt;&lt;/center&gt;
+&lt;img alt="" src="images/activity_user_yearwise-1.svg"&gt;&lt;/p&gt;
+&lt;p&gt;All this ended up in Flock in the form of a &lt;a href="https://docs.google.com/presentation/d/1ANub0RZtqnLaBDzpiQRUkZdnf7n75Pn9H16gb0wZg68/"&gt;presentation&lt;/a&gt; and not to mention, had a good sleep after crunching up the stats :)&lt;/p&gt;</content><category term="fedora"></category><category term="gsoc"></category><category term="python"></category></entry><entry><title>fedstats - Final touches and road ahead</title><link href="/fedstats-final-touches-and-road-ahead.html" rel="alternate"></link><published>2016-07-30T02:26:00+05:30</published><updated>2016-07-30T02:26:00+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-07-30:/fedstats-final-touches-and-road-ahead.html</id><summary type="html">&lt;blockquote&gt;
+&lt;p&gt;GSoC Deadline is coming!&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This week was meant for me to add the final touches to the tool and getting statistics for Flock ready by tweaking it.&lt;/p&gt;
+&lt;h5&gt;Final Touches&lt;/h5&gt;
+&lt;p&gt;The only thing remaining was categorization of output files. This had to be done because the files generated earlier where cluttering …&lt;/p&gt;</summary><content type="html">&lt;blockquote&gt;
+&lt;p&gt;GSoC Deadline is coming!&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;This week was meant for me to add the final touches to the tool and getting statistics for Flock ready by tweaking it.&lt;/p&gt;
+&lt;h5&gt;Final Touches&lt;/h5&gt;
+&lt;p&gt;The only thing remaining was categorization of output files. This had to be done because the files generated earlier where cluttering the main folder if too many users were pulled for. A very elegant solution was to categorize them into folders. by usernames - and then a &lt;code&gt;.gitignore&lt;/code&gt; entry for all the outputs. Although I had &lt;code&gt;.gitignore&lt;/code&gt; entries earlier, I organized files only this week.&lt;/p&gt;
+&lt;p&gt;This is how it basically works :&lt;/p&gt;
+&lt;p&gt;If the tool is called with the &lt;code&gt;--group&lt;/code&gt; argument, the output is stored in &lt;code&gt;&amp;lt;group&amp;gt;/&amp;lt;username&amp;gt;/&amp;lt;output_filename&amp;gt;&lt;/code&gt; and if the tool is called using the &lt;code&gt;--user&lt;/code&gt; argument, then the output is to &lt;code&gt;&amp;lt;username&amp;gt;/&amp;lt;output_filename&amp;gt;&lt;/code&gt;. Also, to avoid confusion - and overwriting of files - the default filename of every file is now &lt;code&gt;&amp;lt;username&amp;gt;_main.&amp;lt;extension&amp;gt;&lt;/code&gt;. If a duplicate entry is found, a numeric number is automatically appended to the end.&lt;/p&gt;
+&lt;p&gt;I also started  prettifying the code and scrubbing it. There were performance issues while grabbing group members but now, the JSON can be locally cached by using &lt;code&gt;--mode json&lt;/code&gt; argument.&lt;/p&gt;
+&lt;p&gt;As of now, the develop branch stands at around 48 commits.&lt;/p&gt;
+&lt;hr&gt;
+&lt;h4&gt;Road Ahead&lt;/h4&gt;
+&lt;p&gt;The tool is written in the format of a script and this needs to be addressed. I have started working on packaging this tool and am currently trying to split up the script into modules to get it ready for packaging. Although it is not on my GSoC timeline, I am anyway going ahead with it.&lt;/p&gt;
+&lt;p&gt;Post-GSoC Goals :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;More powerful stats&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Comparison graphs, multi-threading, caching and more..&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Package the tool&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;The tool needs to get ready for PyPI and needs to be modularized.&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Implement missing features in statscache&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Statscache does not have the graph features (yet). Also, it'll be great to combine it with FAS features for more powerful analytics of data like &lt;code&gt;Count by group&lt;/code&gt; and so forth. There was a discussion on whether the tool should be migrated to statscache or not but considering the target audience, initial plan and the timeline of GSoC, it was scheduled for after GSoC.&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Continue work with Onboarding&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Onboarding is a really long process and I'm looking forward to bettering the Onboarding and Join Process of Fedora&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</content><category term="fedora"></category><category term="gsoc"></category><category term="python"></category></entry><entry><title>Improving statistics using python-fedora API</title><link href="/improving-statistics-using-python-fedora-api.html" rel="alternate"></link><published>2016-07-24T12:09:00+05:30</published><updated>2016-07-24T12:09:00+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-07-24:/improving-statistics-using-python-fedora-api.html</id><summary type="html">&lt;p&gt;I was working on adding the group scraping feature this week. This is one thing that was proposed in a recent meeting of Commops, originally for CommOps retrospective wiki.&lt;/p&gt;
+&lt;p&gt;I was initially thinking of using statscache for this, but came across a few things that stopped me from doing so …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I was working on adding the group scraping feature this week. This is one thing that was proposed in a recent meeting of Commops, originally for CommOps retrospective wiki.&lt;/p&gt;
+&lt;p&gt;I was initially thinking of using statscache for this, but came across a few things that stopped me from doing so. Firstly, statscache is not deployed anywhere, which basically meant that I'll have to pull the historic fedmsg data using &lt;code&gt;fedmsg-hub&lt;/code&gt; for the first run, and anyone who wanted to use the tool will also have to do the same. This tool is to be used by anyone as is, and not everyone will have the resources/bandwidth to download all the &lt;code&gt;fedmsg&lt;/code&gt; messages. Also, statscache lacks the feature of grouping users. I could only find a &lt;code&gt;by_user&lt;/code&gt; count of messages. It made more sense to run the tool on FedoraInfracloud and grab data from it.&lt;/p&gt;
+&lt;p&gt;Now that I could not use statscache, I initially tried scraping using Selenium and requests. After receiving some quality time on it, i realized that I was getting bad responses from the server. &lt;em&gt;(Sigh, CSRF Token Issues)&lt;/em&gt;. After some research and IRC discussions, I came across &lt;code&gt;python-fedora&lt;/code&gt; &lt;a href="https://pythonhosted.org/python-fedora/api.html"&gt;API&lt;/a&gt;. It is an amazing API that does almost anything. Using it, one can log into FAS and perform a lot of actions like editing profile, getting user info,etc.&lt;/p&gt;
+&lt;p&gt;In fedora-python, the &lt;a href="http://www.pythonhosted.org/python-fedora/existing.html#fas"&gt;FAS Modules&lt;/a&gt; can handle logins, session caching and user handling. I wrote a function that'd pull all the users from a specific group, which looks something like this :&lt;/p&gt;
+&lt;script src="https://gist.github.com/sachinkamath/7f5a458a8793aaecc6fd472f40fa999d.js"&gt;&lt;/script&gt;
+
+&lt;p&gt;And guess what, it worked like a charm. Okay - now for the login part - I had two choices; either prompt the password / get it from a config file. I chose the latter because it'd make automation easier. I ended up using &lt;code&gt;ConfigParser&lt;/code&gt; to pull data from a cfg file.&lt;/p&gt;
+&lt;p&gt;During this, I noticed a very interesting thing - The next time I ran the script, I modified my password a bit &lt;em&gt;(the hacker in me prompted me to :p)&lt;/em&gt; and surprisingly - it worked. Session caching is amazing- isn't it. Shoutout to &lt;code&gt;#fedora-admin&lt;/code&gt; for helping me understand that :)&lt;/p&gt;
+&lt;p&gt;And finally, I integrated it in the main script and added the argparse argument of &lt;code&gt;--group / -g&lt;/code&gt; to specify a group for which the data has to be generated. Of course, this should not be paired up with &lt;code&gt;--user&lt;/code&gt;, or it will throw an error. Also, all the internal errors like, bad group name and incorrect credentials is handled by python-fedora itself! Hurray. The script looks much better now! :)&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/Screenshot-from-2016-07-30-20-30-01.png"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;center&gt; &lt;em&gt;Fig : Data being pulled for the CommOps group&lt;/em&gt; &lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;And right now, the develop branch has about 45 commits.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Current repo commit count" src="images/Screenshot-from-2016-07-30-20-41-26.png"&gt;
+&lt;/br&gt;
+I am looking forward to working with Onboarding Series badges and yml files next week and cleaning up and organizing the script files. By next week, the tool should be &lt;em&gt;pycodestyle&lt;/em&gt; ready :)&lt;/p&gt;</content><category term="fedora"></category><category term="gsoc"></category><category term="python"></category></entry><entry><title>Understanding the statscache daemon</title><link href="/understanding-the-statscache-daemon.html" rel="alternate"></link><published>2016-07-17T11:17:00+05:30</published><updated>2016-07-17T11:17:00+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-07-17:/understanding-the-statscache-daemon.html</id><summary type="html">&lt;p&gt;The last two weeks were pretty hectic. I had to read up a lot of documentation, code, fight spam and recover from a failed Fedora Upgrade. Phew, glad to have myself finally back up.&lt;/p&gt;
+&lt;p&gt;To start with, I was working on the stats tool very less this month and was …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The last two weeks were pretty hectic. I had to read up a lot of documentation, code, fight spam and recover from a failed Fedora Upgrade. Phew, glad to have myself finally back up.&lt;/p&gt;
+&lt;p&gt;To start with, I was working on the stats tool very less this month and was concentrating more on the new things I have on list. If you had been following my GSoC Posts, you would probably know that I have been working on a statistics tool for the Summer Interns. During the last CommOps meeting, we had a crazy idea - &lt;strong&gt;Scaling the tool for an entire group/team and later for the community stats&lt;/strong&gt;. That really sounds ambitious and it is. The tool currently uses &lt;a href="https://apps.fedoraproject.org/datagrepper/"&gt;datagrepper&lt;/a&gt; from which HTTP requests can be made to retrieve historic fedmsg data. This method worked fine for the interns as the weekly/monthly data of each of them did not cross 10 pages. However, it will be really slow to pull data of more than, say 50 people from statscache (especially of those who have been doing a lot on &lt;a href="https://koji.fedoraproject.org/"&gt;koji&lt;/a&gt; and &lt;a href="https://copr.fedorainfracloud.org/"&gt;copr&lt;/a&gt;)&lt;/p&gt;
+&lt;p&gt;To solve this issue, &lt;a href="https://github.com/fedora-infra/statscache"&gt;statscache&lt;/a&gt; was built. Statscache is a daemon to build and keep fedmsg statistics. It basically listens to the fedmsg hub waiting for messages. As soon as it encounters a message, it is passed onto the plugins which evaluates the topic and stores the statistics and the relevant parts of the &lt;code&gt;raw_message&lt;/code&gt; locally. For statscache to function as intended, it requires the &lt;a href="https://github.com/fedora-infra/statscache_plugins"&gt;statscache-plugins&lt;/a&gt;. It is the plugins that does all the hard work of maintaining statistics. You could say statscache and statscache-plugins are made for each other :)&lt;/p&gt;
+&lt;p&gt;Deploying statscache locally is fairly simple. As simple as :
+&lt;code&gt;$ git clone https://github.com/fedora-infra/statscache; cd statscache
+$ python setup.py develop&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;And plugins like :
+&lt;code&gt;$ git clone https://github.com/fedora-infra/statscache_plugins; cd statscache_plugins
+$ python setup.py develop&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;After this is done, we need to gather the fedmsg messages. To do that, we will run &lt;code&gt;fedmsg-hub&lt;/code&gt; in the main statscache repo.&lt;em&gt;(To install fedmsg-hub, you need to do &lt;code&gt;sudo dnf install fedmsg-hub&lt;/code&gt;.)&lt;/em&gt; You can stop &lt;code&gt;fedsmg-hub&lt;/code&gt; anytime and statscache will have the statistics of all data you gathered before you exited.  After this is done, the web Flask server can easily be started by running &lt;code&gt;python statscache/app.py&lt;/code&gt;. This should fire up the web front-end on http://localhost:5000. If everything was done correctly, something like this should be on your screen :
+&lt;img alt="" src="images/Screenshot-from-2016-07-19-17-12-54.png"&gt;&lt;/p&gt;
+&lt;p&gt;You can now head over to the dashboard and see the plugins in action.For instance, you can see the volume of data each category received using the volume-by-category plugins, which looks something like this:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/Screenshot-from-2016-07-19-17-14-45.png"&gt;&lt;/p&gt;
+&lt;p&gt;This is often identified using the topic name of &lt;a href="https://fedora-fedmsg.readthedocs.io/en/latest/start.html"&gt;fedmsg&lt;/a&gt;. Every category of fedmsg has a unique topic name assigned to it. For example, if someone opens a new issue on &lt;a href="https://pagure.io"&gt;Pagure&lt;/a&gt;, the topic will be &lt;code&gt;org.fedoraproject.prod.pagure.issue.new&lt;/code&gt; where &lt;code&gt;org.fedoraproject.prod&lt;/code&gt; is common to all the fedmsg topics, whereas &lt;code&gt;pagure&lt;/code&gt; says that the interaction was made on Pagure and the rest is self explanatory. You can see all the topics &lt;a href="https://fedora-fedmsg.readthedocs.io/en/latest/topics.html"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Now, I am currently working on devising a way to auto-generate statistics of all users of a FAS group. I'll make a new post as soon as I make progress here. Till then, Happy Hacking to me :)&lt;/p&gt;</content><category term="fedora"></category><category term="gsoc"></category><category term="python"></category></entry><entry><title>GSoC - Journey So Far ( Badges, Milestones and more..)</title><link href="/gsoc-journey-so-far-badges-milestones-and-more.html" rel="alternate"></link><published>2016-06-29T07:37:17+05:30</published><updated>2016-06-29T07:37:17+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-06-29:/gsoc-journey-so-far-badges-milestones-and-more.html</id><summary type="html">&lt;p&gt;2 days ago, I woke up to a mail from Google saying that I passed the mid term evaluations of GSoC and could continue working towards my final evaluation. &lt;em&gt;"What a wonderful way to kick start a day, I thought"&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Google Summer of Code Mid Term E-Mail" src="images/Screenshot-from-2016-06-29-11-39-35.png"&gt;
+&lt;center&gt;&lt;em&gt;Image : E-mail from Google Summer of Code&lt;/em&gt;&lt;/center&gt;
+&lt;hr&gt;&lt;/p&gt;
+&lt;p&gt;Working on the …&lt;/p&gt;</summary><content type="html">&lt;p&gt;2 days ago, I woke up to a mail from Google saying that I passed the mid term evaluations of GSoC and could continue working towards my final evaluation. &lt;em&gt;"What a wonderful way to kick start a day, I thought"&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Google Summer of Code Mid Term E-Mail" src="images/Screenshot-from-2016-06-29-11-39-35.png"&gt;
+&lt;center&gt;&lt;em&gt;Image : E-mail from Google Summer of Code&lt;/em&gt;&lt;/center&gt;
+&lt;hr&gt;&lt;/p&gt;
+&lt;p&gt;Working on the statistics tool was an amazing experience. You can browse my previous posts for a very detailed idea of what I've been working on. Apart from all the code written, I also got an opportunity to communicate with a lot of amazing people who are part of the Fedora Community as well get bootstrapped to the fedora-infrastructure team &lt;em&gt;(and got an awesome &lt;a href="https://badges.fedoraproject.org/badge/no-longer-a-ronin"&gt;badge&lt;/a&gt; for it)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="https://badges.fedoraproject.org/pngs/no-ronin.png"&gt;&lt;/p&gt;
+&lt;p&gt;Getting sponsored to the fi-apprentice group allows one to access the Fedora Infrastructure machines and setup in read only mode &lt;em&gt;(via SSH)&lt;/em&gt; and understand how things are done. However, write access is only given to those in the sysadmin group, who are generally the l33t people in &lt;code&gt;#fedora-admin&lt;/code&gt; on Freenode ;)&lt;/p&gt;
+&lt;p&gt;Apart from that, I got the opportunity to attend a lot of CommOps Hack sessions and IRC Meetings where we discussed and tackled various pending tickets from the CommOps Trac. We are currently working on Onboarding Badges Series for various Fedora groups. Onboarding badges are generally awarded to all those who complete a set of specific tasks (pre-requisites) and get sponsored into the respective Fedora group. One such badge is to be born very soon - take a look at the CommOps Onboarding ticket &lt;a href="https://fedorahosted.org/fedora-badges/ticket/464"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Life-Cycle of a badge :&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Getting a new badge ready is not a very easy task. A badge is born when someone files a badge idea in the Fedora Badges &lt;a href="https://fedorahosted.org/design-team/"&gt;Trac&lt;/a&gt;. The person who files a ticket is expected to describe the badge as accurately as possible - including the description, name and particulars. After that is done, a person needs to triage the badge and suggest changes to it (if required). The triager is also expected to fill in additional details about the badge so that the &lt;code&gt;YAML&lt;/code&gt; can be made to automate the badge awarding process. The next step is to write yaml definitions for the badge and attach initial concept artwork of the badge. This is reviewed by the &lt;code&gt;fedora-design&lt;/code&gt; team and is either approved or further hacked upon.After the approval, the badge is all set to be shipped. QR codes might be printed to manually award the badge, especially when it is an event badge.&lt;/p&gt;
+&lt;p&gt;Having talked about the badges, I was awarded the following badges during my GSoC Period :
+&lt;img alt="" src="images/Screenshot-from-2016-06-29-12-52-31.png"&gt;
+&lt;center&gt; &lt;em&gt;Image : Coding period badges (and counting ..)&lt;/em&gt; &lt;/center&gt;&lt;/p&gt;
+&lt;p&gt;Badges are a great way to track your progress in the community. It is also super-useful for the new-contributors as they can work keeping the badges as goals. Read bee's blog post about it &lt;a href="https://networksfordata.wordpress.com/2015/10/19/fedorabadges/"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To keep a check on myself, I have compiled all my data over &lt;a href="https://github.com/sachinkamath/fedstats-data/tree/master/interns-mid-term/skamath"&gt;here&lt;/a&gt;. This repo has all the things I have done inside the community and also has SVG graphs that holds the metrics of it. Hoping to have a great summer ahead.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Useful Links for new contributors :&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;WhatCanIDoForFedora - http://whatcanidoforfedora.org/&lt;/li&gt;
+&lt;li&gt;Fedora Join - https://fedoraproject.org/wiki/Join&lt;/li&gt;
+&lt;li&gt;CommOps Onboarding - https://fedoraproject.org/wiki/CommOps/Join&lt;/li&gt;
+&lt;li&gt;Freenode - http://webchat.freenode.net/?channels=#fedora-join  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can also find me hanging out in &lt;code&gt;#fedora-commops&lt;/code&gt; on Freenode. Feel free to drop-in and say hello :)&lt;/p&gt;</content><category term="fedora"></category><category term="gsoc"></category><category term="foss"></category><category term="design"></category></entry><entry><title>fedstats - A final overview</title><link href="/fedstats-a-final-overview.html" rel="alternate"></link><published>2016-06-21T06:01:45+05:30</published><updated>2016-06-21T06:01:45+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-06-21:/fedstats-a-final-overview.html</id><summary type="html">&lt;p&gt;Mid term evaluations of GSoC starts today. It's been a month since it all started and I'd like to blog (brag) about what I've done so far.&lt;/p&gt;
+&lt;p&gt;To start with, here are the list of things I was assigned to work on till the mid-term and the current status of …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Mid term evaluations of GSoC starts today. It's been a month since it all started and I'd like to blog (brag) about what I've done so far.&lt;/p&gt;
+&lt;p&gt;To start with, here are the list of things I was assigned to work on till the mid-term and the current status of it :&lt;/p&gt;
+&lt;p&gt;&lt;OL&gt;
+&lt;LI&gt; &lt;strong&gt;Statistics Tool&lt;/strong&gt;
+&lt;UL&gt;
+&lt;LI&gt; Automate Event Report Visualization
+   &lt;em&gt;&lt;strong&gt;STATUS :&lt;/strong&gt; Check. The tool was used to gen rate user statistics for PyCon US and can be used for any future events.&lt;/em&gt; &lt;a href="https://docs.google.com/spreadsheets/d/11vOxzGmZKagfHYlkW4dXY4EovRcUXVxOJ5OsEId0DBE/edit#gid=0"&gt;[Link]&lt;/a&gt;&lt;/p&gt;
+&lt;LI&gt; Support for multiple formats of Output
+ *&lt;strong&gt;STATUS :&lt;/strong&gt; Check. The tool is feature-rich with support for SVG, PNG, Text, Markdown, CSV and Gource.*
+
+&lt;LI&gt; Pull data of individual users / multiple users for reporting.
+ *&lt;strong&gt;STATUS :&lt;/strong&gt; Check. The tool uses datagrepper to generate statistics. If it's on the datagrepper, it should be covered in the stats. Since the tool is based on arguments, stats can easily be generated for multiple users*
+
+&lt;LI&gt; Document code to help future contributors.
+ *&lt;strong&gt;STATUS :&lt;/strong&gt; Check. The tool has a README which explains the features and the working on the tool in a concise and clear way.*  [[Link to README]](https://pagure.io/gsoc-stats/blob/master/f/README.md)
+&lt;/UL&gt;
+&lt;LI&gt;**Onboarding Series**
+&lt;UL&gt;
+&lt;LI&gt;Identify OnBoarding badges
+*&lt;strong&gt;STATUS :&lt;/strong&gt; Check. The CommOps onboaring badge is now a ticket in the Design Trac.*
+
+&lt;LI&gt;Identify steps to make onboarding better
+*&lt;strong&gt;STATUS :&lt;/strong&gt; Check. The discussion is scattered across all the CommOps meeting that we have had in this month.*&lt;/UL&gt;
+&lt;/OL&gt;
+
+&lt;hr&gt;
+
+#####Stats-Tool : Overview
+&lt;br&gt;
+
+**Features :**
+
+* Gather data from datagrepper for analyzing and visualizing data.
+
+* Support for SVG, PNG, CSV, Markdown, Text and gource style outputs. *(Working on PDF and HTML - HTML is currently halted due to a bug in the `python-grip` module. Waiting for the developer's response on it)*
+
+* Generate category-wise reports (pie / donuts)
+
+
+**This week's work:**
+
+* Added support for gource style outputs *(Inspiration - [fedmsg2gource](https://github.com/ralphbean/fedmsg2gource))*
+
+* Text output mode now branches out to two. The default text mode only prints the statistics onto a text while and when combined with `--log`, it dumps the category-wise activities into the text file.
+
+* Extended the scope of the tool by adding `--start` and `--end` arguments which take in dates in the format **MM/DD/YYY**. Useful for generating event reports.
+
+* `--user=ALL` argument added. This is useful pulling ALL the messages from datagrepper. To be combined with either `--delta` which defaults to delta of one week or `--start` and `--end` arguments.
+
+* Added more options to interactive mode and set defaults.
+
+* Code cleanup and minor enhancements.
+
+**EDIT :** I have generated statistics of all the Google Summer of Code Interns for the mid term. If you are interested, take a look [here](https://goo.gl/Z3wRxj) and [here](https://github.com/sachinkamath/fedstats-data/blob/master/interns-mid-term/).
+
+
+**Repository Statistics :**
+
+Total Issues : 13
+Total Fixed : 11
+Open Issues : 2  *(External Bugs)*</content><category term="fedora"></category><category term="gsoc"></category><category term="code"></category><category term="python"></category></entry><entry><title>Digging deep into datagrepper - More Statistics Features</title><link href="/digging-deep-into-datagrepper-more-statistics-features.html" rel="alternate"></link><published>2016-06-06T20:06:59+05:30</published><updated>2016-06-06T20:06:59+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-06-06:/digging-deep-into-datagrepper-more-statistics-features.html</id><summary type="html">&lt;p&gt;This week was really exciting as I worked further on my &lt;a href="https://pagure.io/gsoc-stats"&gt;statistics tool&lt;/a&gt; for the Fedora and Redhat summer interns. Last week, I had worked on some features like text reports and visualization.&lt;/p&gt;
+&lt;p&gt;After the basic skeleton written last week, a lot of features were added to the tool including …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This week was really exciting as I worked further on my &lt;a href="https://pagure.io/gsoc-stats"&gt;statistics tool&lt;/a&gt; for the Fedora and Redhat summer interns. Last week, I had worked on some features like text reports and visualization.&lt;/p&gt;
+&lt;p&gt;After the basic skeleton written last week, a lot of features were added to the tool including CSV and markdown output, detailed analytics of a category and category-based text reports. Time to dive into the tool.&lt;/p&gt;
+&lt;p&gt;To gather statistics of a user, you basically run the tool either in interactive mode or with the necessary arguments. Let me generate my category-wise report as &lt;strong&gt;SVG&lt;/strong&gt; for this week. The command to do that'd be  &lt;code&gt;python main.py --user=skamath --mode=svg&lt;/code&gt;. The number of weeks defaults to 1. Let's see what I've got.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;All these SVG's are interactive. Right click and select &lt;code&gt;View Image&lt;/code&gt; to get a feel of it. Hover to view percentages and filter by clicking on the color legends.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img alt="" src="images/skamath_main.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Awesome! I just got my activity donut. I have interacted a lot with Pagure this week. Hmm, let's take a closer look at that.&lt;/p&gt;
+&lt;p&gt;To generate the detailed statistics of a particular category, the &lt;code&gt;--category&lt;/code&gt; needs to be set while running the tool. By default, it is set as &lt;code&gt;None&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;This time, the command will be &lt;code&gt;python main.py --user=skamath --mode=svg --category=pagure&lt;/code&gt;, and BHAM!&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/skamath_pagure0.svg"&gt;&lt;/p&gt;
+&lt;p&gt;11 interactions with issues and 26 interactions with pull-request.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/skamath_pagure1.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Under issues, 73% was issue edits and the rest was comments on issues. Boy, fedmsg is powerful - isn't it?&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/skamath_pagure2.svg"&gt;&lt;/p&gt;
+&lt;p&gt;Under pull requests, around 46% were comments and rest were equally distributed among new and closed PR's :)&lt;/p&gt;
+&lt;p&gt;Similarly, statistics in text mode and markdown can also be generated. Markdown can easily be converted to HTML pages and also can be used to update the blog with weekly reports.&lt;/p&gt;
+&lt;p&gt;Here is the &lt;a href="https://paste.fedoraproject.org/375509/"&gt;full text log&lt;/a&gt; generated by the command &lt;code&gt;python main.py --user=skamath&lt;/code&gt;. I am not using mode here because it defaults to &lt;code&gt;text&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Apart from the metrics features, I also added an interactive mode for the tool which can be accessed by &lt;code&gt;python main.py --interactive&lt;/code&gt;. All the arguments required will then be prompted by the tool &lt;em&gt;(as the name suggests, interactively)&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;There's a lot more to be improved. I have miles and miles to go, before I sleep :)&lt;/p&gt;</content><category term="fedora"></category><category term="gsoc"></category><category term="python"></category></entry><entry><title>Getting fedstats-gsoc production ready</title><link href="/getting-fedstats-gsoc-production-ready.html" rel="alternate"></link><published>2016-05-28T06:57:09+05:30</published><updated>2016-05-28T06:57:09+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-05-28:/getting-fedstats-gsoc-production-ready.html</id><summary type="html">&lt;p&gt;I have been working on a tool that generates the statistics of Fedora interns. When writing code and running it, I came across various errors. I thought blogging about it and keeping track of it will be a good idea for anyone who will be using it in the future …&lt;/p&gt;</summary><content type="html">&lt;p&gt;I have been working on a tool that generates the statistics of Fedora interns. When writing code and running it, I came across various errors. I thought blogging about it and keeping track of it will be a good idea for anyone who will be using it in the future. So here goes :&lt;/p&gt;
+&lt;p&gt;Q. What is this anyway ?&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;A :&lt;/strong&gt; It is a CLI tool/script written in python that pulls data from &lt;a href="https://apps.fedoraproject.org/datagrepper/"&gt;datagrepper&lt;/a&gt; and generates graphs/output as per the users' requirement.&lt;/p&gt;
+&lt;p&gt;Q. What are it's features?&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;A:&lt;/strong&gt; Take a look at the project on &lt;a href="https://github.com/sachinkamath/fedora-gsoc-stats/"&gt;Github&lt;/a&gt; or &lt;a href="https://pagure.io/gsoc-stats"&gt;Pagure&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Q. The program throws errors while running. What should I do?
+&lt;strong&gt;A:&lt;/strong&gt; This program was tested on Fedora 23 and ran without any errors/warnings. However, each person has a different machine and errors might have crept in. To begin with, make sure your default Python compiler is 2.7 and not 3.0. This tool is not Python 3.* compatible (yet!). Also make sure your environment variables were set correctly. &lt;code&gt;python --version&lt;/code&gt; should say &lt;code&gt;Python 2.7.*&lt;/code&gt;. If you face an issue, please open an issue in the &lt;a href="https://pagure.io/gsoc-stats/issues"&gt;Issue Tracker&lt;/a&gt; of Pagure.&lt;/p&gt;
+&lt;p&gt;Q. Why are the  SVG's generated blank /  completely dark.
+&lt;strong&gt;A:&lt;/strong&gt; You are using your default image viewer which probably doesn't support viewing of clickable SVG's. Try opening the SVG in a web browser and check if the problem persists. File an issue if you can't get it to work.&lt;/p&gt;
+&lt;p&gt;Q. The PNG image is black / blank.
+&lt;strong&gt;A:&lt;/strong&gt; This is an issue with the installed packages. To overcome this issue, run &lt;code&gt;pip install tinycss cssselect cairosvg&lt;/code&gt;. Try running the tool again and check if the problem persists. If at any point of time the gcc compiler fails with an error message of &lt;code&gt;ffi.h&lt;/code&gt; not found, do &lt;code&gt;sudo dnf install libffi-devel&lt;/code&gt; to solve the issue.&lt;/p&gt;
+&lt;p&gt;Q. The text generated is blank.
+&lt;strong&gt;A:&lt;/strong&gt; You do not have fedora-meta installed. The tool does check for this in the startup and warns you. If you had not noted it, you need to do &lt;code&gt;rpm -q python2-fedmsg-meta-fedora-infrastructure&lt;/code&gt; to check if fedmsg-meta is installed. If it says the package is not installed, you need to do &lt;code&gt;sudo dnf install python2-fedmsg-meta-fedora-infrastructure&lt;/code&gt; to install the package. Run the tool again to check if the problem persists. &lt;em&gt;(Shoutout to &lt;a href="https://fedoraproject.org/wiki/User:Pingou"&gt;pingou&lt;/a&gt; and &lt;a href="https://fedoraproject.org/wiki/User:Ralph"&gt;Ralph&lt;/a&gt; for helping me identify the issue)&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;I'll try to add in more as I develop code further. Let me know what you think of the tool in the comments below.&lt;/p&gt;
+&lt;p&gt;Suggestions/criticism welcome :)&lt;/p&gt;</content><category term="fedora"></category><category term="gsoc"></category><category term="code"></category><category term="python"></category></entry><entry><title>[GSoC '16] Let the Coding Begin!</title><link href="/gsoc-16-let-the-coding-begin.html" rel="alternate"></link><published>2016-05-25T17:57:51+05:30</published><updated>2016-05-25T17:57:51+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-05-25:/gsoc-16-let-the-coding-begin.html</id><summary type="html">&lt;p&gt;The coding period of &lt;a href="http://summerofcode.withgoogle.com"&gt;GSoC&lt;/a&gt; has finally started. It started on 23rd of May, but to me, it just started today as I had taken a 2 day excuse (Exams, sigh). As I mentioned in my earlier post, I will be working with the Fedora Project to build metrics tools …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The coding period of &lt;a href="http://summerofcode.withgoogle.com"&gt;GSoC&lt;/a&gt; has finally started. It started on 23rd of May, but to me, it just started today as I had taken a 2 day excuse (Exams, sigh). As I mentioned in my earlier post, I will be working with the Fedora Project to build metrics tools in Python and also will also be helping the Commops team in refining the Fedora Onboarding process.&lt;/p&gt;
+&lt;p&gt;My internship this summer will be mostly, Python centric and will involve a lot of scraping, automation, analytics and data crunching. I am currently working on a &lt;a href="https://pagure.io/gsoc-stats"&gt;gsoc-statistics&lt;/a&gt; tool for Fedora which will auto-magically generate weekly reports given a fedora FAS username. Instead of pushing code to Github, which I do; quite often, I have decided to work with Pagure, Fedora's own repository tracker. There's a GSoC project to improve &lt;a href="http://pagure.io"&gt;Pagure&lt;/a&gt; as well ;)&lt;/p&gt;
+&lt;p&gt;To start off with the work, I decided to draw a rough skeleton of what I'd like the stats-tool to look like. I usually plan everything on paper, but since I'm home, I had the luxury of using the whiteboard. Here's what my whiteboard looks like now :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Image of my whiteboard" src="images/P_20160525_231250_1-1.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;This is just the beginning, and I'm excited already. Hoping to have a great summer this year :)&lt;/p&gt;
+&lt;p&gt;Oh, and if you are a FOSS enthusiast and would like to start contributing to Fedora, do take a look at &lt;a href="http://whatcanidoforfedora.org"&gt;WhatCanIDoForFedora&lt;/a&gt;. If you have any other Fedora related questions, feel free to ping me on IRC / e-mail. I go by the nick &lt;code&gt;skamath&lt;/code&gt; on Freenode. You can find me in the &lt;code&gt;#fedora-commops&lt;/code&gt; channel.&lt;/p&gt;</content><category term="fedora"></category><category term="gsoc"></category></entry><entry><title>[GSoC '16] Summer with Fedora</title><link href="/gsoc-16-summer-with-fedora.html" rel="alternate"></link><published>2016-05-02T05:15:16+05:30</published><updated>2016-05-02T05:15:16+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-05-02:/gsoc-16-summer-with-fedora.html</id><summary type="html">&lt;p&gt;This summer, I am super excited to announce that I am participating in &lt;a href="https://summerofcode.withgoogle.com"&gt;Google Summer of Code&lt;/a&gt; for the &lt;a href="https://fedoraproject.org"&gt;Fedora Project&lt;/a&gt;. As Google describes it :&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Google Summer of Code is a global program focused on bringing more student developers into open source software development. Students work with an open source …&lt;/em&gt;&lt;/p&gt;</summary><content type="html">&lt;p&gt;This summer, I am super excited to announce that I am participating in &lt;a href="https://summerofcode.withgoogle.com"&gt;Google Summer of Code&lt;/a&gt; for the &lt;a href="https://fedoraproject.org"&gt;Fedora Project&lt;/a&gt;. As Google describes it :&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;Google Summer of Code is a global program focused on bringing more student developers into open source software development. Students work with an open source organization on a 3 month programming project during their break from school.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;This year, I will be working with the awesome &lt;a href="https://fedoraproject.org/wiki/CommOps"&gt;CommOps Team&lt;/a&gt; to improve their exisitng Toolbox. My project proposal can be found &lt;a href="https://fedoraproject.org/wiki/GSOC_2016/Student_Application_skamath"&gt;here&lt;/a&gt;. Fedora is not a new to me. I have been contributing to Fedora, both actively and passively for around 2 years now. To be specific, I have contributed to the &lt;a href="https://github.com/glittergallery/GlitterGallery"&gt;Glittergallery project&lt;/a&gt; and have delivered a couple of talks on contributing to Fedora, the details of which can be found &lt;a href="https://fedoraproject.org/wiki/User:Skamath"&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;I would like to thank &lt;a href="https://fedoraproject.org/wiki/User:decause"&gt;decause&lt;/a&gt; who is my mentor for this project, the awesome peeps at CommOps (special shout-out to &lt;a href="https://fedoraproject.org/wiki/User:Jflory"&gt;jflory7&lt;/a&gt; and  &lt;a href="https://fedoraproject.org/wiki/User:linuxmodder"&gt;linuxmodder&lt;/a&gt; for helping me get started and &lt;a href="https://fedoraproject.org/wiki/User:bee2502"&gt;bee2502&lt;/a&gt; for the first Karma Badge :)&lt;/p&gt;
+&lt;p&gt;Right now, it is the community bonding period and I am getting more involved with the CommOps team in understanding the place better. I am also getting familiar with the &lt;a href="https://fedoraproject.org/wiki/CommOps#Toolbox"&gt;CommOps Toolbox&lt;/a&gt; on which I will be hacking on.&lt;/p&gt;
+&lt;p&gt;Expect more posts as I make progress. Till then, Goodbye and stay silly :)&lt;/p&gt;</content><category term="fedora"></category><category term="gsoc"></category></entry><entry><title>HackceptionCTF Work Log - Week 1</title><link href="/hackception-work-log-week-1.html" rel="alternate"></link><published>2016-01-23T05:33:22+05:30</published><updated>2016-01-23T05:33:22+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-01-23:/hackception-work-log-week-1.html</id><summary type="html">&lt;p&gt;Event Co-Ordinators' worklog of Hackception CTF and an introduction to Capture The Flag, organized by Sachin S Kamath and Nishaanth  Guna for Anokha 2016.&lt;/p&gt;</summary><content type="html">&lt;p&gt;Anokha is coming! Yeayy! With less than a month to go for Anokha, work needs to be done on Hackception CTF to get it up and running on the big day. This is the second edition of the CTF, and is going to be bigger, better and merrier this time as a lot of planning has been done on the event. First things first, you can find the event page &lt;a href="https://anokha.amrita.edu/event/hackceptiononsite-ctf-event/14"&gt;here&lt;/a&gt;. What's more? It's free.&lt;/p&gt;
+&lt;p&gt;This is what the previous years' contestants had to say:&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://unclassifiederrors.blogspot.in/2015/03/hackception-experience-at-amrita.html"&gt;Blog Post of Team Unclassified Errors&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://hackception.wordpress.com/2015/03/05/anokha-2k15-hackception-event/"&gt;Shyam's Blog Post&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://bsdchoudhary.blogspot.in/"&gt;Sunil's Blog Post&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;And the prize winning blog post : ~~&lt;a href="https://github.com/abiram11/The-Blog/blob/master/Day1.cpp"&gt;Abhiram's Blog,err. Code&lt;/a&gt;~~ Looks like he took it down.&lt;/p&gt;
+&lt;p&gt;'Nuff said. Less talks and more hacks this time.&lt;/p&gt;
+&lt;p&gt;Wondering what a CTF is? Well, Capture-The-Flag events are usually held to test the wit , skills and intelligence of a programmer or/and a hacker. CTF's are broadly categorized into two. Jeopardy and Attack 'n' Defense. Jeopardy is more like an online treasure hunt game where you are given a few puzzles/questions along with a clue for you to solve it. Once you solve it correctly, you usually receive a flag which can be entered into a flag submission portal which will grade you on basis of the correctness of the flag you have entered. Flags are usually long strings of plain-text or a MD5 encrypted hash. Of course, it is not going to be as easy as a treasure hunt. But yeah, it ain't rocket science too ;)&lt;/p&gt;
+&lt;p&gt;Attack 'n' Defense is the real deal. You might be good with jeopardy but the real test of the skills is done in the Attack 'n' Defense round. It's &lt;em&gt;Survival of the Fittest, no mercy.&lt;/em&gt; Make Mistakes and watch your opponent tear your computer apart, savaging all the resources you have. You have to defend yourself from incoming attacks as well as attack the other opponents in a typical Attack n Defense CTF within a limited period of time. The game mechanism is fairly complex too. A gameserver, or the "Big Brother", constantly pushes random MD5 hashes into the vulnerable services of every team every &lt;em&gt;x&lt;/em&gt; minutes. A team has to break into any opponent's system and exploit a vulnerability in the hosted service to extract the flag from the user. Every successful submission of a stolen flag will give the attackers' team points and will reduce defense points of the defending team. Told you, IT'S WARRR! The Battle of 0's and 1's, and occasionally idiots.&lt;/p&gt;
+&lt;p&gt;That being said, I expect to do the following things this week :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;~~Figure out the Platform to use. Hackademic is unusable now. Bad Bad Code~~.
+Pico it is. Waiting for permissions from the authors.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;~~Setup Apache alongside nginx to support pico and MongoDB. I know they don't go well together, but yeah. Let me give it a shot~~. Done. My seniors are awesome guides :D&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;~~Write Web, Linux and Networking challenges. Easy ones. Will extend for a couple of weeks~~. Decided to make the practice questions this week.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;~~Make a Slack user group, an IRC for delivering clues and somehow link it up with Slack~~. Done. Done. Slack is awesome. IRC is well umm, just nostalgic. Gives me a 90's hacker feel :')&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Configure the above IRC Bot to automatically give out clues at random times from a predefined list of clues.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;~~Tweak  the event information, rules in the Anokha Main page.~~ Event Managers taking care of it.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Tweak pico to my heart's content.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Yes, the work is hectic and tweaking source code of an existing application is a nightmare for most programmers. Nevertheless, it's fun and always a learning experience. After all, it's for one of the biggest tech fest of South India ;)&lt;/p&gt;</content></entry><entry><title>Directory Listing - Dangerous?</title><link href="/directory-listing-dangerous.html" rel="alternate"></link><published>2016-01-15T18:05:54+05:30</published><updated>2016-01-15T18:05:54+05:30</updated><author><name>skamath</name></author><id>tag:None,2016-01-15:/directory-listing-dangerous.html</id><summary type="html">&lt;p&gt;Post on Dangers of Directory listing, explained in a lucid and simple ma$&lt;/p&gt;</summary><content type="html">&lt;p&gt;While browsing web pages, most of us expect to see only the pages offered by the website. For instance, if you are reading this blog, you will only be expected to see my landing page, posts, tags and the author information. I'll really not want to you take a look at my admin panel or the other administrative facilities of this blog. This not only keeps my blog neat and to-the-point but also reduces the risk of attacks.&lt;/p&gt;
+&lt;p&gt;So, let's assume that you are a hacker and want to gather information about my website. As the first step, you'll naturally have to find how my files are arranged/segregated. But how do you do it?&lt;/p&gt;
+&lt;p&gt;Yes.Browsers! A powerful application which gets more powerful every other day. If you didn't know,every browser lets you view the source of any website by right-clicking and selecting &lt;code&gt;Inspect Element&lt;/code&gt;. Let's do it. Go to any website, say &lt;em&gt;Google&lt;/em&gt;. Now there's a nice colourful logo and it is an image. Images have to be stored somewhere to be able render it in a web-page. Let's find out where Google is storing it's doodle. If everything goes right, you'll see the location of the image in the CSS rules in the right-bottom corner. Something like this:
+&lt;img alt="" src="images/cssrule.png"&gt;&lt;/p&gt;
+&lt;p&gt;Awesome. Google stores their data in &lt;code&gt;http://google.com/images/branding/googlelogo/lx/&lt;/code&gt;. Hmm, but that page is giving me a 404 error when visited.Let's try visiting the image URL &lt;strong&gt;as such&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;https://www.google.co.in/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;It works! What does that mean? Google managed to restrict your access to the folder that the image is in, but gave you access to the particular image. Google doesn't want you to see the entire contents of the folder because it might contain a lot of stuff that is not relevant for you. We just saw a classical example of Directory Listing being disabled.&lt;/p&gt;
+&lt;p&gt;Let's look at another website. This time, a less secure one. I have setup an example on my website to demonstrate Directory listing. Go ahead and visit :
+&lt;code&gt;http://www.sachinwrites.xyz/sandbox/&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;You will encounter this page :
+&lt;img alt="" src="images/Screenshot-from-2016-01-15-22-56-00.png"&gt;&lt;/p&gt;
+&lt;p&gt;As I mentioned earlier, every image has to be stored somewhere in some form or the other. Go ahead and do an &lt;code&gt;Inspect Element&lt;/code&gt; on the Image. You will see that the image is stored in &lt;code&gt;/storage/sysadmin.jpg&lt;/code&gt;. Go-to &lt;code&gt;https://sachinwrites.xyz/sandbox/storage/sysadmin.jpg&lt;/code&gt; and you'll have the full-image in front of you. Let us try to look into the folder of the image. Remove the image name from the URL and see what you get.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/Screenshot-from-2016-01-15-23-01-03.png"&gt;&lt;/p&gt;
+&lt;p&gt;You are able to see the contents of the entire folder as the developer forgot to block Directory Indexes. Have fun exploring the new-found folder ;)&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;How exactly is this undesirable?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As you might have noticed, it reveals everything present in the folder. It might include sensitive documents, login credentials, php backup files, zip files and more. This can be dangerous from the security point of view.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;How to prevent Directory Listing?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;There are a lot of ways to do it. The easiest and the most undesirable way of doing it is to put a blank &lt;code&gt;index.html&lt;/code&gt; page in every folder of your website. This way, directories won't be listed.&lt;/p&gt;
+&lt;p&gt;The better way of doing it is by using a &lt;code&gt;.htaccess&lt;/code&gt; file on an Apache server. You don't need an &lt;code&gt;.htaccess&lt;/code&gt; for nginx server. As nginx wiki says :&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;If you need .htaccess [with Nginx], you're probably doing it wrong.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Coming back, to prevent directory listing on an entire webserver, just write &lt;code&gt;Options -Indexes&lt;/code&gt; in the &lt;code&gt;.htaccess&lt;/code&gt; file and you're good to go.
+The same can also be done in the apache configuration files. Also, for &lt;code&gt;.htaccess&lt;/code&gt; to work properly, you need to set allow overrides in the Apache configuration files. I'll leave that part for you to figure out.&lt;/p&gt;
+&lt;p&gt;There were numerous instances of a website getting pwned just because of the fact that the developer was either too lazy or stupid to block it. Directory Listing is always the first step for gathering information about a website, according to me. To conclude with, here's a bonus meme :&lt;/p&gt;
+&lt;p&gt;&lt;img alt="" src="images/bill.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;Hope you liked the post. Comment your thoughts below and I'd be more than happy to hear from you. Cheers.&lt;/p&gt;</content><category term="security"></category><category term="guide"></category><category term="tech"></category></entry><entry><title>The Mandatory Hello World.</title><link href="/the-mandatory-hello-world.html" rel="alternate"></link><published>2015-08-24T20:10:00+05:30</published><updated>2015-08-24T20:10:00+05:30</updated><author><name>skamath</name></author><id>tag:None,2015-08-24:/the-mandatory-hello-world.html</id><summary type="html">&lt;p&gt;Hey there. If it was not evident from my landing page, I am Sachin S Kamath. To begin with, I am 19 years old and do a lot more than an engineering student should be doing in his/her age. I take pride in saying I am a gamer, cyber-security …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Hey there. If it was not evident from my landing page, I am Sachin S Kamath. To begin with, I am 19 years old and do a lot more than an engineering student should be doing in his/her age. I take pride in saying I am a gamer, cyber-security enthusiast and a keen follower of FOSS, all of which is "self-proclaimed".&lt;/p&gt;
+&lt;p&gt;I am that person who believes nothing is impossible provided there is time, dedication and passion to work towards it. Talking about the technical aspects of me, I prefer Linux anyday over Windows and can debate on this topic for hours (Howdy, Windows fans :P ). That being said, I do not deny the fact that nothing beats a Windows in the aspect of GPU support.
+Windows - 1
+Linux - 99&lt;/p&gt;
+&lt;p&gt;Apart from this, I love to break stuff. If there is a nice little shiny computer sitting next to me, I will do all that I can to tamper with it and find out why it's shining so much afterall. That reminds me of this beautiful ranting :&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Yes, I am a criminal.  My crime is that of curiosity.  My crime is
+that of judging people by what they say and think, not what they look like.My crime is that of outsmarting you, something that you will never forgive me for - Mentor&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;In this blog, you can expect to find a log of all my technical and rarely, non-technical work. I will try to keep this blog active. Oh, Did I tell you I am just an amateur blogger? That means, I am very open to suggestions and will reply to almost all of the suggestions/criticism you inbox me.&lt;/p&gt;
+&lt;p&gt;You can contact me at : sskamath96@gmail.com&lt;/p&gt;
+&lt;p&gt;Old blog : http://sachinskamath.wordpress.com&lt;/p&gt;
+&lt;p&gt;Stay Silly :)&lt;/p&gt;</content><category term="firstpost"></category><category term="intro"></category></entry><entry><title>[Repost] Pwning an entire network using nmap</title><link href="/pwning-an-entire-network-using-nmap.html" rel="alternate"></link><published>2014-12-28T18:03:00+05:30</published><updated>2014-12-28T18:03:00+05:30</updated><author><name>skamath</name></author><id>tag:None,2014-12-28:/pwning-an-entire-network-using-nmap.html</id><summary type="html">&lt;p&gt;Originally posted on &lt;a href="https://bufferoutofbounds.wordpress.com/2014/12/29/pwning-an-entire-network-using-nmap/"&gt;HackerSpace&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;When every friend of mine was busy studying for the finals,only thing I could do was to think in what subjects I would flunk and how pathetically I would screw my GPA. Though I tried my best,only thing I was able to do was …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Originally posted on &lt;a href="https://bufferoutofbounds.wordpress.com/2014/12/29/pwning-an-entire-network-using-nmap/"&gt;HackerSpace&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;When every friend of mine was busy studying for the finals,only thing I could do was to think in what subjects I would flunk and how pathetically I would screw my GPA. Though I tried my best,only thing I was able to do was worry,worry and worry.
+Thinking of taking a break(from not studying and using FB),I thought it would be a better idea to use Whatsapp for a while.
+I switched on my Internet. Other than the boring texts from the groups,I didn’t get anything(as usual xP). After some time,beep beep and I get a text from Sachin who is my junior(most of the time hyperactive) Then was suggesting me if we could try to get access to the cameras around our college infrastructure.&lt;/p&gt;
+&lt;p&gt;The idea seemed nice. And since I was doing almost nothing,I thought it would be better to do something interesting.&lt;/p&gt;
+&lt;p&gt;So,what have we got?
+Nothing except the IP of FTP address which we use very often in our labs to download books and questions.
+It was of the range 172.17.171.*
+Thought we would do a sweep of 172.17.171.0-255 range.
+Being so stupid,I tried to write a script which scans all the IP’s within that range. Though I could make it work,I wasn’t able to make it scan fast enough.
+But,we got 7 IP’s which were up in that range. So,we took one IP and tried opening.&lt;/p&gt;
+&lt;p&gt;Bazinga! It was a surveillance camera. Obviously it was password protected.
+But sad. They forgot to change the default password of the camera. So we did Google for the specific camera’s default user name and password.
+We’re in! We never thought it would happen. That camera was of that of my college’s library.&lt;/p&gt;
+&lt;p&gt;We started thinking about getting access to all the cameras(Just for fun,though xP).
+It was becoming late and I haven’t studied for my exam yet.
+So Sachin said that he would volunteer for the job of entire ping sweep of all 65535 IP’s in that range. This time we thought we would take help from Nmap which is blazingly fast.
+It took just minutes to scan the entire network and we got 1212 IP’s which were live.&lt;/p&gt;
+&lt;p&gt;Again! The next problem.How can we know if that specific IP corresponds to a camera or not?
+I did a curl of the webpage and checked using grep if that site’s source code contained the word ‘XYZBrand Camera’. Bingo! We got all the cameras in our network. But certain of the passwords didn’t match with the default ones. So we brute forced everything.
+We got into all the cameras of our infrastructure.&lt;/p&gt;
+&lt;p&gt;But,wait! What about the rest of the IP’s? We tried different search terms like ‘Router’,’Switch’,’Firewall’. And at last,we got all the IP’s of Cameras + Routers + Switches + Firewall and some blackbox shit which we couldn’t understand what it is.
+So we thought of trying the default password for each service. If not,we brute forced and got access.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Mission accomplished!&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;(I get it. I screwed up my exams and even flunked in one subject which I thought I would definitely pass. Karma -_- I am planning to study for that once this post is done.)&lt;/p&gt;
+&lt;p&gt;Lessons learned :&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Nmap is always the best.&lt;/li&gt;
+&lt;li&gt;Study for your final exams.&lt;/li&gt;
+&lt;li&gt;Never forget the basics of penetration testing.&lt;/li&gt;
+&lt;li&gt;Never report this to college officials.
+Chances are high that they wouldn’t give a damn or embarrass for pointing out vulnerabilities in their server.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;(The characters mentioned in this story are real and are having a tough time in college to study for the exams and never get grades up to their parent’s expectation)&lt;/p&gt;</content><category term="college"></category><category term="security"></category><category term="hacking"></category></entry></feed>

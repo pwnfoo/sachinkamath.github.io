@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>fedstats - A final overview</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Full Atom Feed" />
+        <link href="/feeds/gsoc.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Categories Atom Feed" />
+        <link href="/rss/gsoc.xml" type="application/rss+xml" rel="alternate" title="Sachin's Blog Categories RSS Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="/" class="pure-menu-heading  pure-menu-link">Sachin's Blog</a>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="/category/gsoc.html" class="category">gsoc</a><br />
+
+    <a class="author" href="/author/skamath.html">skamath</a>
+    &mdash; <abbr title="2016-06-21T06:01:45+05:30">Tue 21 June 2016</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image-small">
+                <div class="title-container">
+                    <h1>fedstats - A final overview</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>Mid term evaluations of GSoC starts today. It's been a month since it all started and I'd like to blog (brag) about what I've done so far.</p>
+<p>To start with, here are the list of things I was assigned to work on till the mid-term and the current status of it :</p>
+<p><OL>
+<LI> <strong>Statistics Tool</strong>
+<UL>
+<LI> Automate Event Report Visualization
+   <em><strong>STATUS :</strong> Check. The tool was used to gen rate user statistics for PyCon US and can be used for any future events.</em> <a href="https://docs.google.com/spreadsheets/d/11vOxzGmZKagfHYlkW4dXY4EovRcUXVxOJ5OsEId0DBE/edit#gid=0">[Link]</a></p>
+<LI> Support for multiple formats of Output
+ *<strong>STATUS :</strong> Check. The tool is feature-rich with support for SVG, PNG, Text, Markdown, CSV and Gource.*
+
+<LI> Pull data of individual users / multiple users for reporting.
+ *<strong>STATUS :</strong> Check. The tool uses datagrepper to generate statistics. If it's on the datagrepper, it should be covered in the stats. Since the tool is based on arguments, stats can easily be generated for multiple users*
+
+<LI> Document code to help future contributors.
+ *<strong>STATUS :</strong> Check. The tool has a README which explains the features and the working on the tool in a concise and clear way.*  [[Link to README]](https://pagure.io/gsoc-stats/blob/master/f/README.md)
+</UL>
+<LI>**Onboarding Series**
+<UL>
+<LI>Identify OnBoarding badges
+*<strong>STATUS :</strong> Check. The CommOps onboaring badge is now a ticket in the Design Trac.*
+
+<LI>Identify steps to make onboarding better
+*<strong>STATUS :</strong> Check. The discussion is scattered across all the CommOps meeting that we have had in this month.*</UL>
+</OL>
+
+<hr>
+
+#####Stats-Tool : Overview
+<br>
+
+**Features :**
+
+* Gather data from datagrepper for analyzing and visualizing data.
+
+* Support for SVG, PNG, CSV, Markdown, Text and gource style outputs. *(Working on PDF and HTML - HTML is currently halted due to a bug in the `python-grip` module. Waiting for the developer's response on it)*
+
+* Generate category-wise reports (pie / donuts)
+
+
+**This week's work:**
+
+* Added support for gource style outputs *(Inspiration - [fedmsg2gource](https://github.com/ralphbean/fedmsg2gource))*
+
+* Text output mode now branches out to two. The default text mode only prints the statistics onto a text while and when combined with `--log`, it dumps the category-wise activities into the text file.
+
+* Extended the scope of the tool by adding `--start` and `--end` arguments which take in dates in the format **MM/DD/YYY**. Useful for generating event reports.
+
+* `--user=ALL` argument added. This is useful pulling ALL the messages from datagrepper. To be combined with either `--delta` which defaults to delta of one week or `--start` and `--end` arguments.
+
+* Added more options to interactive mode and set defaults.
+
+* Code cleanup and minor enhancements.
+
+**EDIT :** I have generated statistics of all the Google Summer of Code Interns for the mid term. If you are interested, take a look [here](https://goo.gl/Z3wRxj) and [here](https://github.com/sachinkamath/fedstats-data/blob/master/interns-mid-term/).
+
+
+**Repository Statistics :**
+
+Total Issues : 13
+Total Fixed : 11
+Open Issues : 2  *(External Bugs)*
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="/tag/fedora.html">fedora</a>
+            <a href="/tag/gsoc.html">gsoc</a>
+            <a href="/tag/code.html">code</a>
+            <a href="/tag/python.html">python</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="/author/skamath.html"><img src="https://lh6.googleusercontent.com/-zEMaXmWAhdI/AAAAAAAAAAI/AAAAAAAAAAA/eVdgsm3TIDU/s128-c-k/photo.jpg" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="/author/skamath.html">skamath</a></h3>
+                        <p class="author-description">
+                          
+            I am a self-proclaimed command-line warrior and web ninja, who slays the bad folks <i>(usually with a -9)</i>. I love security and forensics as much as I love Python. 
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'sachinwritesxyz';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="/" title="Sachin's Blog">Sachin's Blog</a>
+        <a href="/category/gsoc.html">gsoc</a>
+        <a href="/category/rants.html">rants</a>
+        <a href="/category/security.html">security</a>
+
+    </footer>
+
+</body>
+</html>

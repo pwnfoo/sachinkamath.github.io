@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>fedstats - Final touches and road ahead</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Full Atom Feed" />
+        <link href="/feeds/gsoc.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Categories Atom Feed" />
+        <link href="/rss/gsoc.xml" type="application/rss+xml" rel="alternate" title="Sachin's Blog Categories RSS Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="/" class="pure-menu-heading  pure-menu-link">Sachin's Blog</a>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="/category/gsoc.html" class="category">gsoc</a><br />
+
+    <a class="author" href="/author/skamath.html">skamath</a>
+    &mdash; <abbr title="2016-07-30T02:26:00+05:30">Sat 30 July 2016</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image-small">
+                <div class="title-container">
+                    <h1>fedstats - Final touches and road ahead</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <blockquote>
+<p>GSoC Deadline is coming!</p>
+</blockquote>
+<p>This week was meant for me to add the final touches to the tool and getting statistics for Flock ready by tweaking it.</p>
+<h5>Final Touches</h5>
+<p>The only thing remaining was categorization of output files. This had to be done because the files generated earlier where cluttering the main folder if too many users were pulled for. A very elegant solution was to categorize them into folders. by usernames - and then a <code>.gitignore</code> entry for all the outputs. Although I had <code>.gitignore</code> entries earlier, I organized files only this week.</p>
+<p>This is how it basically works :</p>
+<p>If the tool is called with the <code>--group</code> argument, the output is stored in <code>&lt;group&gt;/&lt;username&gt;/&lt;output_filename&gt;</code> and if the tool is called using the <code>--user</code> argument, then the output is to <code>&lt;username&gt;/&lt;output_filename&gt;</code>. Also, to avoid confusion - and overwriting of files - the default filename of every file is now <code>&lt;username&gt;_main.&lt;extension&gt;</code>. If a duplicate entry is found, a numeric number is automatically appended to the end.</p>
+<p>I also started  prettifying the code and scrubbing it. There were performance issues while grabbing group members but now, the JSON can be locally cached by using <code>--mode json</code> argument.</p>
+<p>As of now, the develop branch stands at around 48 commits.</p>
+<hr>
+<h4>Road Ahead</h4>
+<p>The tool is written in the format of a script and this needs to be addressed. I have started working on packaging this tool and am currently trying to split up the script into modules to get it ready for packaging. Although it is not on my GSoC timeline, I am anyway going ahead with it.</p>
+<p>Post-GSoC Goals :</p>
+<ul>
+<li>
+<p>More powerful stats</p>
+<p><em>Comparison graphs, multi-threading, caching and more..</em></p>
+</li>
+<li>
+<p>Package the tool</p>
+<p><em>The tool needs to get ready for PyPI and needs to be modularized.</em></p>
+</li>
+<li>
+<p>Implement missing features in statscache</p>
+<p><em>Statscache does not have the graph features (yet). Also, it'll be great to combine it with FAS features for more powerful analytics of data like <code>Count by group</code> and so forth. There was a discussion on whether the tool should be migrated to statscache or not but considering the target audience, initial plan and the timeline of GSoC, it was scheduled for after GSoC.</em></p>
+</li>
+<li>
+<p>Continue work with Onboarding</p>
+<p><em>Onboarding is a really long process and I'm looking forward to bettering the Onboarding and Join Process of Fedora</em></p>
+</li>
+</ul>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="/tag/fedora.html">fedora</a>
+            <a href="/tag/gsoc.html">gsoc</a>
+            <a href="/tag/python.html">python</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="/author/skamath.html"><img src="https://lh6.googleusercontent.com/-zEMaXmWAhdI/AAAAAAAAAAI/AAAAAAAAAAA/eVdgsm3TIDU/s128-c-k/photo.jpg" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="/author/skamath.html">skamath</a></h3>
+                        <p class="author-description">
+                          
+            I am a self-proclaimed command-line warrior and web ninja, who slays the bad folks <i>(usually with a -9)</i>. I love security and forensics as much as I love Python. 
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'sachinwritesxyz';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="/" title="Sachin's Blog">Sachin's Blog</a>
+        <a href="/category/gsoc.html">gsoc</a>
+        <a href="/category/rants.html">rants</a>
+        <a href="/category/security.html">security</a>
+
+    </footer>
+
+</body>
+</html>

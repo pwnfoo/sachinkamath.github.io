@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>The final week - GSoC Wrap Up</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Full Atom Feed" />
+        <link href="/feeds/gsoc.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Categories Atom Feed" />
+        <link href="/rss/gsoc.xml" type="application/rss+xml" rel="alternate" title="Sachin's Blog Categories RSS Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="/" class="pure-menu-heading  pure-menu-link">Sachin's Blog</a>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="/category/gsoc.html" class="category">gsoc</a><br />
+
+    <a class="author" href="/author/skamath.html">skamath</a>
+    &mdash; <abbr title="2016-08-15T09:05:46+05:30">Mon 15 August 2016</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(https://communityblog.fedoraproject.org/wp-content/uploads/2016/03/gsoc-announce-1.png);">
+                <img src="https://communityblog.fedoraproject.org/wp-content/uploads/2016/03/gsoc-announce-1.png" alt="The final week - GSoC Wrap Up">
+                <div class="title">
+                <h1>
+                    The final week - GSoC Wrap Up
+                </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>Happy Independence day, India!</p>
+<p>Also, today marks the beginning of the GSoC deadline week. This post will wrap-up what I have done during my intern period.</p>
+<h1>Community Bonding period</h1>
+<ul>
+<li>Figure out how fedmsg works<div class="highlight"><pre><span></span>fedmsg (FEDerated MeSsaGe bus) is a python package and API defining a brokerless messaging architecture to send and receive messages to and from applications.
+</pre></div>
+
+
+</li>
+</ul>
+<p>fedmsg was used to gather messages for statistics generation.</p>
+<p><a href="http://www.fedmsg.com/en/latest/">Documentation</a></p>
+<ul>
+<li>Figure out how datagrepper works.<div class="highlight"><pre><span></span>Datagrepper is a web-app to retrieve historical information about messages on the fedmsg bus. It is a JSON API for the datanommer message store.
+</pre></div>
+
+
+</li>
+</ul>
+<p>Datagrepper queries were made to retrieve messages for users and was letter compiled into one bigger JSON file and rendered into other forms of output.</p>
+<p><a href="https://apps.fedoraproject.org/datagrepper/reference">Reference</a></p>
+<ul>
+<li>Familiarize with all the tools in Toolbox.<div class="highlight"><pre><span></span>CommOps Toolbox is a set of tools that aims at automating tedious tasks.
+</pre></div>
+
+
+</li>
+</ul>
+<p>I had to deliver a tool which could be combined with the existing tools for CommOps storytelling and Metrics process.</p>
+<p><a href="https://fedoraproject.org/wiki/CommOps#Toolbox">Reference</a></p>
+<h1>Coding Period - Mid Term</h1>
+<p><br>
+<strong>1st Quarter:</strong></p>
+<ul>
+<li>
+<p>Onboarding Series - Badge Identification</p>
+<ul>
+<li>
+<p>Onboarding is really important for large communities like Fedora. Until Fedora Hubs arrives, badges were decided to be an ideal way to track progress.</p>
+</li>
+<li>
+<p>Started digging information on badges and how it works.</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Automated GSoC Reports</p>
+<ul>
+<li>
+<p>A tool was to be delivered that could initially give statistics of all the Fedora / RedHat / Outreachy interns that would automatically generate CSV's and graphs based on a user's activity. Scaling the tool was pushed for later.</p>
+</li>
+<li>
+<p>Repo for data : https://github.com/sachinkamath/fedstats-data/</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Badges .yaml definitions</p>
+<ul>
+<li>This was pushed for as the tool had to added into the toolbox before the mid-term.</li>
+</ul>
+</li>
+<li>
+<p>Automate Events Report Analysis</p>
+</li>
+<li>
+<p>Bee's Script (to be uploaded) as a start</p>
+</li>
+<li>
+<p>Parse a csv, give rudimentary stats about users/fedmsgs:
+           Using stats-tool : <a href="https://docs.google.com/spreadsheets/d/11vOxzGmZKagfHYlkW4dXY4EovRcUXVxOJ5OsEId0DBE/edit#gid=0">PyCon Data</a> ( PyCon US Statistics was generated using this tool)</p>
+</li>
+</ul>
+<p><strong>2nd Quarter:</strong></p>
+<ul>
+<li>
+<p>Work on adding more features to the tool</p>
+<ul>
+<li>More output options such as markdown, gource and csv was added during this period
+<br></li>
+</ul>
+</li>
+<li>
+<p>Generate mid-term reports</p>
+<ul>
+<li>Public repo : <a href="https://github.com/sachinkamath/fedstats-data/tree/master/interns-mid-term">fedstats-data</a></li>
+</ul>
+</li>
+</ul>
+<p><strong>Blog Posts for this period</strong></p>
+<p><a href="https://sachinwrites.xyz/2016/05/02/gsoc-16-summer-with-fedora/">Summer with Fedora</a></p>
+<p><a href="https://sachinwrites.xyz/2016/05/25/gsoc-16-let-the-coding-begin/">Let the Coding Begin</a></p>
+<p><a href="https://sachinwrites.xyz/2016/05/28/getting-fedstats-gsoc-production-ready/">Getting fedstats production ready</a></p>
+<p><a href="https://sachinwrites.xyz/2016/06/06/digging-deep-into-datagrepper-more-statistics-features/">Digging deep into datagrepper</a></p>
+<p><a href="https://sachinwrites.xyz/2016/06/21/fedstats-a-final-overview/">Mid term Overview</a></p>
+<h1>Mid-term to Finals</h1>
+<ul>
+<li>
+<p>Scale GSoC metrics script for teams and events.</p>
+<ul>
+<li>https://sachinwrites.xyz/tag/gsoc</li>
+<li>https://pagure.io/gsoc-stats/branch/develop</li>
+</ul>
+</li>
+<li>
+<p>Improving the efficiency of the script.</p>
+<ul>
+<li>Local JSON caching and organized output pulls.</li>
+</ul>
+</li>
+<li>
+<p>Scraping an entire group</p>
+<ul>
+<li>Using the python-fedora API, it was made possible. Selenium and bs4 didn't work due to CSRF issues.</li>
+</ul>
+</li>
+<li>
+<p>Onboarding - One at a time, extends Post- GSoC</p>
+</li>
+<li>
+<p>https://fedorahosted.org/fedora-badges/ticket/464</p>
+</li>
+<li>https://fedorahosted.org/fedora-badges/ticket/466</li>
+<li>https://fedorahosted.org/fedora-badges/ticket/434</li>
+<li>https://fedorahosted.org/fedora-badges/ticket/441</li>
+<li>
+<p>https://fedorahosted.org/fedora-badges/ticket/442</p>
+</li>
+<li>
+<p>Contributor Statistics using GSoC tool</p>
+</li>
+<li>
+<p>More details in <a href="https://sachinwrites.xyz/2016/08/06/identifying-fedora-contributors-stats-for-flock/">this</a> blog post.</p>
+</li>
+<li>
+<p>Statistics was presented at Flock by bee. <a href="https://docs.google.com/presentation/d/1ANub0RZtqnLaBDzpiQRUkZdnf7n75Pn9H16gb0wZg68/">Presentation Link</a></p>
+</li>
+<li>
+<p>Code Scrubbing and style fixes</p>
+</li>
+</ul>
+<p><strong>Blog Posts for this period</strong></p>
+<p><a href="https://sachinwrites.xyz/2016/06/29/gsoc-journey-so-far-badges-milestones-and-more/">Journey So Far</a></p>
+<p><a href="https://sachinwrites.xyz/2016/07/17/understanding-the-statscache-daemon/">Understanding statscache</a></p>
+<p><a href="https://sachinwrites.xyz/2016/07/24/improving-statistics-using-python-fedora-api/">Improving statistics using python-fedora API</a></p>
+<p><a href="https://sachinwrites.xyz/2016/07/30/fedstats-final-touches-and-road-ahead/">Final touches and road ahead</a></p>
+<p><a href="https://sachinwrites.xyz/2016/08/06/identifying-fedora-contributors-stats-for-flock/">Identifying Fedora Contributors</a></p>
+<h1>Post GSOC</h1>
+<ul>
+<li>Work on statscache<ul>
+<li>https://github.com/fedora-infra/statscache</li>
+</ul>
+</li>
+<li>Modularize existing tool - Work in Progress<ul>
+<li>https://pagure.io/gsoc-stats/branch/modular</li>
+</ul>
+</li>
+<li>Master tool for all in one metrics<ul>
+<li>Integrate badge statistics, a flask front-end for metrics for one-click statistics generation.
+<hr></li>
+</ul>
+</li>
+</ul>
+<p>Working with the amazing people over at Fedora was indeed a really good experience. In this 3 months, I collected around <a href="https://badges.fedoraproject.org/user/skamath">51 badges</a>.</p>
+<p>One badge which I am really proud of this the black and white cookie badge, given to users who have helped 25 Fedorans. It has been only awarded to 31 times so far. Cookies! \o/</p>
+<p><img alt="" src="https://badges.fedoraproject.org/pngs/blackandwhitecookie.png"></p>
+<p>Current badges rank, Gotta Badge 'Em All!</p>
+<p><img alt="" src="images/Screenshot-from-2016-08-15-14-29-53.png"></p>
+<p>Current Repository statistics :</p>
+<p><img alt="" src="images/Screenshot-from-2016-08-15-14-31-30.png"></p>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="/tag/fedora.html">fedora</a>
+            <a href="/tag/gsoc.html">gsoc</a>
+            <a href="/tag/python.html">python</a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="/author/skamath.html"><img src="https://lh6.googleusercontent.com/-zEMaXmWAhdI/AAAAAAAAAAI/AAAAAAAAAAA/eVdgsm3TIDU/s128-c-k/photo.jpg" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="/author/skamath.html">skamath</a></h3>
+                        <p class="author-description">
+                          
+            I am a self-proclaimed command-line warrior and web ninja, who slays the bad folks <i>(usually with a -9)</i>. I love security and forensics as much as I love Python. 
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'sachinwritesxyz';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="/" title="Sachin's Blog">Sachin's Blog</a>
+        <a href="/category/gsoc.html">gsoc</a>
+        <a href="/category/rants.html">rants</a>
+        <a href="/category/security.html">security</a>
+
+    </footer>
+
+</body>
+</html>
