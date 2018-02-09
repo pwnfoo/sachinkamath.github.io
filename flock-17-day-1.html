@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <title>Flock '17 - Day 1</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/pure-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pure/0.6.0/grids-responsive-min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.4.0/css/font-awesome.min.css" />
+        <link href="https://fonts.googleapis.com/css?family=Lato:400,400i" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
+        
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Full Atom Feed" />
+        <link href="/feeds/conferences.atom.xml" type="application/atom+xml" rel="alternate" title="Sachin's Blog Categories Atom Feed" />
+        <link href="/rss/conferences.xml" type="application/rss+xml" rel="alternate" title="Sachin's Blog Categories RSS Feed" />
+</head>
+<body>
+
+    <div class="navigation pure-menu pure-menu-horizontal">
+        <a href="/" class="pure-menu-heading  pure-menu-link">Sachin's Blog</a>
+    </div>
+
+
+<div class="page-container">
+    <div class="entry-content">
+        <div class="post-meta pure-g">
+<div class="pure-u-3-4 meta-data">
+    <a href="/category/conferences.html" class="category">conferences</a><br />
+
+    <a class="author" href="/author/skamath.html">skamath</a>
+    &mdash; <abbr title="2017-09-06T00:00:00+05:30">Wed 06 September 2017</abbr>
+</div>        </div>
+    </div>
+
+    <div class="article-header-container">
+        <div class="background-image-container">
+
+            <div class="background-image" style="background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(https://i.imgur.com/yLW8oczg.jpg);">
+                <img src="https://i.imgur.com/yLW8oczg.jpg" alt="Flock '17 - Day 1">
+                <div class="title">
+                <h1>
+                    Flock '17 - Day 1
+                </h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="entry-content">
+        <p>After a good nights sleep, I woke up pretty early for attending the session lined up on Day1. I walked to a nearby restaurant for breakfast and rushed back to the conference room just in time for the traditional State of Fedora Talk by the FPL (Fedora Project Leader), <a href="https://fedoraproject.org/wiki/User:Mattdm">Matthew Miller</a>. He used beautiful graphs to explain how Fedora was progressing, and also discussed the possibility of expanding the community and user base further. It was fascinating to look at the charts and see how Fedora usage has increased and decreased over the years and how various changes in the distro affected the popularity. If you are reading this, I highly recommend you check out his <a href="https://mattdm.org/fedora/2017flock/2017-State-of-Fedora.pdf">slides</a>.</p>
+<p>We had a group photo session shortly after mattdm's talk, and the stage was almost full. Here's a picture of a lot of people saying 'Linux' <em>(because Cheese is too mainstream and already packaged for Fedora)</em> :
+<img alt="" src="images/flockgroup.jpg"></p>
+<p>After the opening talk, everyone hosting a session had to do a 30-second pitch on what they are presenting about and why it's going to be an excellent one.</p>
+<p>If you're wondering how many sessions were planned for Flock, here's the <a href="flock2017.sched.com">schedule</a>.</p>
+<p>My schedule was set for the day. I grabbed some coffee and went around meeting people until lunch. The first session post lunch that I attended was the Pagure Hackfest, which was posted by <a href="https://fedoraproject.org/wiki/User:Pingou">pingou</a>. I had also volunteered to do the AV recording for the session, so I quickly set up the recorder and settled down.</p>
+<p>Pingou gave an introduction to Pagure and explained what each component does, as it is in the Pagure docs. The quick introduction helped me understand how Pagure actually works under the hood. I had set up my development environment before the session, so I started hacking right away! Browsing through the list of easy fixes, I found a bug that looked simple enough to start with. Since the code base was relatively huge, I started grepping through it to find the relevant part. After looking around a bit, I found the code that required fixing, patched it up and ran the tests - which obviously blew up. Pingou helped me understand what was going on and I finally did fix it finally <em>(Curse the email header format!)</em>. <strike>A PR is pending on pagure for this</strike> <a href="https://pagure.io/pagure/pull-request/2567">My first PR</a> just got merged into Pagure o/</p>
+<p>In my opinion, this was one of the best sessions I attended because I contributed to it and there was more hacking than talking. As I worked on the easy fixes, the infra folks were trying to zap the bigger bugs (which they did!). I secretly wished all sessions were hack-sessions and not the regular talks after attending the Pagure Hackfest :)</p>
+<p>The next thing on my schedule was a talk on Fedora Hubs. Hubs is the next big thing coming up in the Fedora community, which is going to change a <strong>lot</strong> of things - starting from onboarding contributors to helping the members to keep track of meetings, badge progress and more. <a href="https://fedoraproject.org/wiki/User:Sayanchowdhury">Sayan Chowdhury</a> &amp; <a href="https://fedoraproject.org/wiki/User:Abompard">Auruelien Bompard</a>, the developers of Fedora Hubs explained how Hubs work and how it can make an make a difference in the way we work in the community now. <a href="https://fedoraproject.org/wiki/User:Duffy">Mairin Duffy</a>, the UX designer of Fedora Hubs showed us how Hubs is going to look like. This was an introduction to the Hubs Hackfest that was planned for Day 2, and the pitch for it during the session was perfect! I decided to get Hubs up and running later at night to attend the hack session next day.</p>
+<p>Next up on my schedule was the Fedora Magazine Workshop. I participated in this session because I follow the magazine closely, and was always curious to know more about how they work to get the best articles published. The talk was really interesting as they talked about the life cycle of an article, right from the pitch stage - where a user could pitch an idea to the Magazine team, to the scheduling stage - where the people who had the publishing rights on the Magazine Wordpress instance could set a time to publish the polished article. The session wrapped up with a lot of people suggesting new articles for the magazine.</p>
+<p>After all the sessions, we had a game night and international candy exchange - where people brought sweets and savouries from all around the world and shared with the rest of the community. The candy exchange was the biggest one so far, thanks to Justin who coordinated it. If you are wondering what the candy table looked like, here is an <a href="https://imgur.com/a/Yb2KW">imgur image</a>.</p>
+<p>It was a great day! I did so much, learned even more and had a lot of fun. Oh, and did I mention we had unlimited pizza for the game night? ;)</p>
+    </div>
+
+    <footer>
+        <div class="tags">
+            <a href="/tag/fedora.html">fedora</a>
+            <a href="/tag/travel.html">travel</a>
+            <a href="/tag/conference.html">conference</a>
+        </div>
+        <div class="pagination pure-u-1-2 right">
+            <a href="/"> <span class="fa fa-arrow-left"></span> Go Back </a>
+        </div>
+        <div class="pure-g post-footer">
+            <div class="pure-u-1 pure-u-md-1-2">
+                <div class="pure-g poster-info">
+                    <div class="pure-u">
+                        <a href="/author/skamath.html"><img src="https://lh6.googleusercontent.com/-zEMaXmWAhdI/AAAAAAAAAAI/AAAAAAAAAAA/eVdgsm3TIDU/s128-c-k/photo.jpg" alt=""></a>
+                    </div>
+                    <div class="pure-u-3-4">
+                        <h3 class="author-name"><a href="/author/skamath.html">Sachin S. Kamath</a></h3>
+                        <p class="author-description">
+                          
+            I am a self-proclaimed command-line warrior and web ninja, who slays the bad folks <i>(usually with a -9)</i>. I love security and forensics as much as I love Python. 
+        
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+    </footer>
+
+    <div class="entry-content">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            var disqus_shortname = 'sachinwritesxyz';
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+    </div>
+
+</div>
+
+
+
+    <footer class="index-footer">
+
+        <a href="/" title="Sachin's Blog">Sachin's Blog</a>
+        <a href="/category/conferences.html">conferences</a>
+        <a href="/category/gsoc.html">gsoc</a>
+        <a href="/category/misc.html">misc</a>
+        <a href="/category/rants.html">rants</a>
+        <a href="/category/security.html">security</a>
+
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title>Sachin's Blog - arch</title><link>/</link><description></description><atom:link href="/rss/tag-arch.xml" rel="self"></atom:link><lastBuildDate>Fri, 04 Aug 2017 09:05:46 +0530</lastBuildDate><item><title>Arch, Arch and away!</title><link>/arch-away.html</link><description>&lt;blockquote&gt;
+&lt;p&gt;Foo : Hey, I just installed Arch and I can't connect to the internet.&lt;/p&gt;
+&lt;p&gt;Bar : Hey, my DE won't boot in Arch. Help, please.&lt;/p&gt;
+&lt;p&gt;FooBar : Man, I installed Arch and I can't find sudo. Will I die?&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;I wanted to put this up on Devrant but thought I'd write a bit …&lt;/p&gt;</description><dc:creator xmlns:dc="http://purl.org/dc/elements/1.1/">skamath</dc:creator><pubDate>Fri, 04 Aug 2017 09:05:46 +0530</pubDate><guid>tag:None,2017-08-04:/arch-away.html/</guid><category>arch</category><category>linux</category><category>rants</category></item></channel></rss>
