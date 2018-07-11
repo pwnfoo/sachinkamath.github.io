@@ -62,14 +62,12 @@ There was a social event after the day with a lot of free! *(as in free beer)* b
  the world of Open Source. After the session, I went to attend the Fedora Panel discussion. There was a discussion about the council, voting process, diversity and a lot of other hot topics going around in the community. I was hacking on Inkscape a bit to fix the FOSDEM badge png I had pushed so I missed a good bit of the discussion.
 
  ![](images/devconf6.jpg)
-
- <center> *Fig 4 : Council discussion* </center>
+<center> *Fig 4 : Council discussion* </center>
 
 
  After this was State of Pagure talk by Pingou *(Yesss, in the same room)*. He started off with a picture of a nice little experiment we were doing at the Fedora booth. We had set up a board which reads "Hi, My name is <name-here>, and I pronounce Pagure as Pagure" and recorded various people saying it. It's a joke that started at Flock and continued. It'll soon be a pull request in the [How do you pronounce Pagure](https://pagure.io/how-do-you-pronounce-pagure/tree/master) repo ;)
 
  ![](images/devconf5.jpg)
-
  <center> *Fig 5 : State of Pagure talk by Pingou* </center>
 
 After this talk, I went to volunteer at the Fedora booth and helped Miro with recordings of people pronouncing Pagure :D I also met up with pjp, an ambassador and APAC treasurer, who runs the APAC meetings. We chatted a bit about the current state of ambassador program and Mindshare initiative. I was walking around after this and heard that there was a security survey going on around in the campus. I went to take up the survey, which was about SSL certificates and how people
